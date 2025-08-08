@@ -1,0 +1,99 @@
+Create a Chrome Extension (Manifest V3) project scaffold using React, TypeScript, and Vite. Use Radix UI (primitives + @radix-ui/themes) in dark mode from the start, zod for validation, and set up MV3 background service worker, popup, and options pages. Do NOT hardcode any API keys. We will wire Gemini calls in Part 2.
+
+# Tech and deps
+- React + TypeScript + Vite
+- Radix UI: @radix-ui/react-* and @radix-ui/themes
+- zod
+- Use chrome.storage for local state
+- MV3 background service worker (type: module)
+
+# File structure
+- /src
+  - /popup
+    - index.html
+    - index.tsx
+    - Popup.tsx
+    - components/
+      - PromptEditor.tsx
+      - ScorePanel.tsx
+      - ImprovedPanel.tsx
+      - HistoryList.tsx
+      - Toolbar.tsx
+  - /options
+    - index.html
+    - index.tsx
+    - Options.tsx
+  - /background
+    - background.ts
+    - gemini.ts        // stub only now
+  - /lib
+    - schema.ts        // zod schemas (stub for now)
+    - messages.ts      // typed messages between popup and bg
+    - storage.ts       // chrome.storage helpers (stubs ok)
+    - ui.tsx           // CopyButton and small helpers (stubs ok)
+- manifest.json
+- vite.config.ts
+- package.json
+- README.md
+- /public/icons with 16,32,48,128 pngs
+
+# Manifest (MV3)
+- name: "Prompt Optimizer"
+- version: "1.0.0"
+- action.default_popup: "popup/index.html"
+- options_ui.page: "options/index.html", open_in_tab: true
+- background.service_worker: "background/background.js", type: "module"
+- permissions: ["storage"]
+- host_permissions: ["https://generativelanguage.googleapis.com/*"]
+- icons: point to /public/icons
+
+# Vite config
+- Multiple inputs so build outputs:
+  - dist/popup/index.html + bundle
+  - dist/options/index.html + bundle
+  - dist/background/background.js as a single ESM file
+- Copy manifest.json and icons to dist
+
+# Theme and global styles
+- Import "@radix-ui/themes/styles.css" once in each app entry (popup index.tsx and options index.tsx)
+- Wrap both roots in <Theme appearance="dark">
+
+# Popup initial UI (skeleton only)
+- Header: "Prompt Optimizer" and a subtle link "Options" that calls chrome.runtime.openOptionsPage()
+- Large TextArea (Radix) for the prompt
+- Two primary Buttons: "Score" and "Optimize" (disabled by default until Part 2 wiring)
+- Panels:
+  - ScorePanel placeholder with muted text "No score yet"
+  - ImprovedPanel placeholder with muted text "No improved prompt yet"
+- HistoryList placeholder area
+- Toolbar with disabled Copy buttons
+
+# Options page (skeleton)
+- Card titled "Gemini API key"
+- TextField for key input
+- Save and Test buttons (wire later)
+- Small privacy paragraph
+
+# TypeScript stubs to add
+// src/lib/messages.ts
+export type BgRequest =
+  | { type: "SCORE_PROMPT"; prompt: string }
+  | { type: "OPTIMIZE_PROMPT"; prompt: string };
+
+export type BgResponse<T = unknown> =
+  | { ok: true; data: T }
+  | { ok: false; error: string };
+
+// src/background/background.ts
+- Set up chrome.runtime.onMessage.addListener with a switch on msg.type
+- For now, return { ok: false, error: "Not implemented yet" } for both
+
+# Build scripts in package.json
+- "dev": vite
+- "build": vite build
+- "zip": zip dist into /release/prompt-optimizer.zip
+
+# README seed
+- How to install locally
+- Load unpacked steps
+- Note: "API wiring comes in Part 2"
