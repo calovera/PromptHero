@@ -246,23 +246,73 @@ const Popup: React.FC = () => {
             </Callout.Root>
           )}
 
-          {/* Loading Animation */}
+          {/* Prompt Editor */}
+          {!isLoading && (
+            <PromptEditor
+              value={prompt}
+              onChange={setPrompt}
+              onClear={handleClear}
+              onPresetSelect={handlePresetSelect}
+              disabled={isLoading}
+            />
+          )}
+
+          {/* Loading Animation - Full Screen Overlay */}
           {isScoring && (
-            <LoadingAnimation message="Analyzing your prompt..." />
+            <div style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: 'rgba(0, 0, 0, 0.8)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 1000
+            }}>
+              <div style={{
+                background: 'var(--gray-1)',
+                borderRadius: '12px',
+                padding: '24px',
+                textAlign: 'center',
+                border: '1px solid var(--gray-6)'
+              }}>
+                <LoadingAnimation message="Analyzing your prompt..." size={120} type="scoring" />
+                <Text size="2" style={{ color: 'var(--gray-11)', marginTop: '12px', display: 'block' }}>
+                  This might take a few seconds
+                </Text>
+              </div>
+            </div>
           )}
           
           {isOptimizing && (
-            <LoadingAnimation message="Optimizing your prompt..." />
+            <div style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: 'rgba(0, 0, 0, 0.8)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 1000
+            }}>
+              <div style={{
+                background: 'var(--gray-1)',
+                borderRadius: '12px',
+                padding: '24px',
+                textAlign: 'center',
+                border: '1px solid var(--gray-6)'
+              }}>
+                <LoadingAnimation message="Creating your improved prompt..." size={120} type="optimizing" />
+                <Text size="2" style={{ color: 'var(--gray-11)', marginTop: '12px', display: 'block' }}>
+                  This might take a few seconds
+                </Text>
+              </div>
+            </div>
           )}
-
-          {/* Prompt Editor */}
-          <PromptEditor
-            value={prompt}
-            onChange={setPrompt}
-            onClear={handleClear}
-            onPresetSelect={handlePresetSelect}
-            disabled={isLoading}
-          />
 
           {/* Toolbar */}
           <Toolbar

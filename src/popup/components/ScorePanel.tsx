@@ -38,27 +38,49 @@ const ScorePanel: React.FC<ScorePanelProps> = ({ title, score }) => {
       
       {score.issues.length > 0 && (
         <div style={{ marginBottom: '12px' }}>
-          <Text size="1" weight="medium" style={{ color: 'var(--red-11)', marginBottom: '6px', display: 'block' }}>
-            Issues:
+          <Text size="2" weight="medium" style={{ color: 'var(--red-11)', marginBottom: '8px', display: 'block' }}>
+            Issues Found:
           </Text>
-          {score.issues.map((issue, idx) => (
-            <Text key={idx} size="1" style={{ display: 'block', marginLeft: '8px', marginBottom: '2px' }}>
-              • {issue}
-            </Text>
-          ))}
+          <div style={{ 
+            background: 'var(--red-2)', 
+            border: '1px solid var(--red-6)',
+            borderRadius: '6px',
+            padding: '12px'
+          }}>
+            {score.issues.map((issue, idx) => (
+              <Text key={idx} size="2" style={{ 
+                display: 'block', 
+                marginBottom: '6px',
+                lineHeight: '1.5'
+              }}>
+                • {issue}
+              </Text>
+            ))}
+          </div>
         </div>
       )}
       
       {score.suggestions.length > 0 && (
         <div>
-          <Text size="1" weight="medium" style={{ color: 'var(--green-11)', marginBottom: '6px', display: 'block' }}>
+          <Text size="2" weight="medium" style={{ color: 'var(--green-11)', marginBottom: '8px', display: 'block' }}>
             Suggestions:
           </Text>
-          {score.suggestions.map((suggestion, idx) => (
-            <Text key={idx} size="1" style={{ display: 'block', marginLeft: '8px', marginBottom: '2px' }}>
-              • {suggestion}
-            </Text>
-          ))}
+          <div style={{ 
+            background: 'var(--green-2)', 
+            border: '1px solid var(--green-6)',
+            borderRadius: '6px',
+            padding: '12px'
+          }}>
+            {score.suggestions.map((suggestion, idx) => (
+              <Text key={idx} size="2" style={{ 
+                display: 'block', 
+                marginBottom: '6px',
+                lineHeight: '1.5'
+              }}>
+                • {suggestion}
+              </Text>
+            ))}
+          </div>
         </div>
       )}
     </Card>

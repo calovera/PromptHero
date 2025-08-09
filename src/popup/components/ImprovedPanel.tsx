@@ -35,30 +35,46 @@ const ImprovedPanel: React.FC<ImprovedPanelProps> = ({ improved, checklist, onCo
         </Button>
       </Flex>
       
-      <pre style={{ 
+      <div style={{ 
         background: 'var(--gray-3)', 
-        padding: '12px', 
-        borderRadius: '6px', 
-        fontSize: '12px',
-        lineHeight: '1.4',
-        marginBottom: checklist ? '12px' : '0',
-        whiteSpace: 'pre-wrap',
-        wordWrap: 'break-word',
-        fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace'
+        border: '1px solid var(--gray-6)',
+        borderRadius: '8px', 
+        padding: '16px',
+        marginBottom: checklist ? '16px' : '0',
+        maxHeight: '200px',
+        overflowY: 'auto'
       }}>
-        {improved}
-      </pre>
+        <Text size="2" style={{ 
+          lineHeight: '1.6',
+          display: 'block',
+          whiteSpace: 'pre-wrap',
+          wordWrap: 'break-word'
+        }}>
+          {improved}
+        </Text>
+      </div>
       
       {checklist && checklist.length > 0 && (
         <div>
-          <Text size="1" weight="medium" style={{ marginBottom: '6px', display: 'block' }}>
-            Improvements made:
+          <Text size="2" weight="medium" style={{ marginBottom: '8px', display: 'block' }}>
+            Improvements Made:
           </Text>
-          {checklist.map((item, idx) => (
-            <Text key={idx} size="1" style={{ display: 'block', marginLeft: '8px', marginBottom: '2px' }}>
-              ✓ {item}
-            </Text>
-          ))}
+          <div style={{ 
+            background: 'var(--blue-2)', 
+            border: '1px solid var(--blue-6)',
+            borderRadius: '6px',
+            padding: '12px'
+          }}>
+            {checklist.map((item, idx) => (
+              <Text key={idx} size="2" style={{ 
+                display: 'block', 
+                marginBottom: '6px',
+                lineHeight: '1.5'
+              }}>
+                ✓ {item}
+              </Text>
+            ))}
+          </div>
         </div>
       )}
     </Card>

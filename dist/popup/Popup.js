@@ -177,7 +177,41 @@ const Popup = () => {
         chrome.runtime.openOptionsPage();
     };
     const isLoading = isScoring || isOptimizing;
-    return (_jsx(Theme, { appearance: "dark", accentColor: "blue", grayColor: "slate", radius: "medium", scaling: "95%", children: _jsxs("div", { style: { width: '400px', height: '600px', padding: '16px', overflow: 'auto' }, children: [toast && (_jsx(Toast, { message: toast.message, type: toast.type, onClose: () => setToast(null) })), _jsxs(Flex, { direction: "column", gap: "4", style: { height: '100%' }, children: [_jsxs(Flex, { justify: "between", align: "center", children: [_jsx(Text, { size: "5", weight: "bold", children: "Prompt Optimizer" }), _jsx(Button, { size: "1", variant: "ghost", onClick: openOptions, children: "Open Options" })] }), !apiKeyConfigured && (_jsx(Callout.Root, { color: "red", children: _jsxs(Callout.Text, { children: ["API key not configured.", ' ', _jsx(Button, { variant: "ghost", size: "1", onClick: openOptions, children: "Open Options" })] }) })), error && (_jsx(Callout.Root, { color: "red", children: _jsx(Callout.Text, { children: error }) })), isScoring && (_jsx(LoadingAnimation, { message: "Analyzing your prompt..." })), isOptimizing && (_jsx(LoadingAnimation, { message: "Optimizing your prompt..." })), _jsx(PromptEditor, { value: prompt, onChange: setPrompt, onClear: handleClear, onPresetSelect: handlePresetSelect, disabled: isLoading }), _jsx(Toolbar, { onScore: handleScore, onOptimize: handleOptimize, onCopyOriginal: () => handleCopy(prompt, 'Original prompt'), onCopyImproved: () => handleCopy(improvedPrompt, 'Improved prompt'), disabled: {
+    return (_jsx(Theme, { appearance: "dark", accentColor: "blue", grayColor: "slate", radius: "medium", scaling: "95%", children: _jsxs("div", { style: { width: '400px', height: '600px', padding: '16px', overflow: 'auto' }, children: [toast && (_jsx(Toast, { message: toast.message, type: toast.type, onClose: () => setToast(null) })), _jsxs(Flex, { direction: "column", gap: "4", style: { height: '100%' }, children: [_jsxs(Flex, { justify: "between", align: "center", children: [_jsx(Text, { size: "5", weight: "bold", children: "Prompt Optimizer" }), _jsx(Button, { size: "1", variant: "ghost", onClick: openOptions, children: "Open Options" })] }), !apiKeyConfigured && (_jsx(Callout.Root, { color: "red", children: _jsxs(Callout.Text, { children: ["API key not configured.", ' ', _jsx(Button, { variant: "ghost", size: "1", onClick: openOptions, children: "Open Options" })] }) })), error && (_jsx(Callout.Root, { color: "red", children: _jsx(Callout.Text, { children: error }) })), !isLoading && (_jsx(PromptEditor, { value: prompt, onChange: setPrompt, onClear: handleClear, onPresetSelect: handlePresetSelect, disabled: isLoading })), isScoring && (_jsx("div", { style: {
+                                position: 'fixed',
+                                top: 0,
+                                left: 0,
+                                right: 0,
+                                bottom: 0,
+                                background: 'rgba(0, 0, 0, 0.8)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                zIndex: 1000
+                            }, children: _jsxs("div", { style: {
+                                    background: 'var(--gray-1)',
+                                    borderRadius: '12px',
+                                    padding: '24px',
+                                    textAlign: 'center',
+                                    border: '1px solid var(--gray-6)'
+                                }, children: [_jsx(LoadingAnimation, { message: "Analyzing your prompt...", size: 120, type: "scoring" }), _jsx(Text, { size: "2", style: { color: 'var(--gray-11)', marginTop: '12px', display: 'block' }, children: "This might take a few seconds" })] }) })), isOptimizing && (_jsx("div", { style: {
+                                position: 'fixed',
+                                top: 0,
+                                left: 0,
+                                right: 0,
+                                bottom: 0,
+                                background: 'rgba(0, 0, 0, 0.8)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                zIndex: 1000
+                            }, children: _jsxs("div", { style: {
+                                    background: 'var(--gray-1)',
+                                    borderRadius: '12px',
+                                    padding: '24px',
+                                    textAlign: 'center',
+                                    border: '1px solid var(--gray-6)'
+                                }, children: [_jsx(LoadingAnimation, { message: "Creating your improved prompt...", size: 120, type: "optimizing" }), _jsx(Text, { size: "2", style: { color: 'var(--gray-11)', marginTop: '12px', display: 'block' }, children: "This might take a few seconds" })] }) })), _jsx(Toolbar, { onScore: handleScore, onOptimize: handleOptimize, onCopyOriginal: () => handleCopy(prompt, 'Original prompt'), onCopyImproved: () => handleCopy(improvedPrompt, 'Improved prompt'), disabled: {
                                 score: !prompt.trim() || isLoading || !apiKeyConfigured,
                                 optimize: !prompt.trim() || isLoading || !apiKeyConfigured,
                                 copyOriginal: !prompt.trim(),

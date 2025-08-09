@@ -11,6 +11,24 @@ const ScorePanel = ({ title, score }) => {
             return 'yellow';
         return 'red';
     };
-    return (_jsxs(Card, { style: { padding: '16px' }, children: [_jsxs(Flex, { justify: "between", align: "center", style: { marginBottom: '12px' }, children: [_jsx(Text, { size: "2", weight: "medium", children: title }), _jsxs(Badge, { size: "2", color: getScoreColor(score.score), children: [score.score, "/100"] })] }), score.issues.length > 0 && (_jsxs("div", { style: { marginBottom: '12px' }, children: [_jsx(Text, { size: "1", weight: "medium", style: { color: 'var(--red-11)', marginBottom: '6px', display: 'block' }, children: "Issues:" }), score.issues.map((issue, idx) => (_jsxs(Text, { size: "1", style: { display: 'block', marginLeft: '8px', marginBottom: '2px' }, children: ["\u2022 ", issue] }, idx)))] })), score.suggestions.length > 0 && (_jsxs("div", { children: [_jsx(Text, { size: "1", weight: "medium", style: { color: 'var(--green-11)', marginBottom: '6px', display: 'block' }, children: "Suggestions:" }), score.suggestions.map((suggestion, idx) => (_jsxs(Text, { size: "1", style: { display: 'block', marginLeft: '8px', marginBottom: '2px' }, children: ["\u2022 ", suggestion] }, idx)))] }))] }));
+    return (_jsxs(Card, { style: { padding: '16px' }, children: [_jsxs(Flex, { justify: "between", align: "center", style: { marginBottom: '12px' }, children: [_jsx(Text, { size: "2", weight: "medium", children: title }), _jsxs(Badge, { size: "2", color: getScoreColor(score.score), children: [score.score, "/100"] })] }), score.issues.length > 0 && (_jsxs("div", { style: { marginBottom: '12px' }, children: [_jsx(Text, { size: "2", weight: "medium", style: { color: 'var(--red-11)', marginBottom: '8px', display: 'block' }, children: "Issues Found:" }), _jsx("div", { style: {
+                            background: 'var(--red-2)',
+                            border: '1px solid var(--red-6)',
+                            borderRadius: '6px',
+                            padding: '12px'
+                        }, children: score.issues.map((issue, idx) => (_jsxs(Text, { size: "2", style: {
+                                display: 'block',
+                                marginBottom: '6px',
+                                lineHeight: '1.5'
+                            }, children: ["\u2022 ", issue] }, idx))) })] })), score.suggestions.length > 0 && (_jsxs("div", { children: [_jsx(Text, { size: "2", weight: "medium", style: { color: 'var(--green-11)', marginBottom: '8px', display: 'block' }, children: "Suggestions:" }), _jsx("div", { style: {
+                            background: 'var(--green-2)',
+                            border: '1px solid var(--green-6)',
+                            borderRadius: '6px',
+                            padding: '12px'
+                        }, children: score.suggestions.map((suggestion, idx) => (_jsxs(Text, { size: "2", style: {
+                                display: 'block',
+                                marginBottom: '6px',
+                                lineHeight: '1.5'
+                            }, children: ["\u2022 ", suggestion] }, idx))) })] }))] }));
 };
 export default ScorePanel;
