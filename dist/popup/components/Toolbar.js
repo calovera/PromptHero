@@ -1,7 +1,6 @@
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
-import { Flex } from '@radix-ui/themes';
-import { CopyButton } from '../../lib/ui';
-const Toolbar = ({ prompt, improvedPrompt }) => {
-    return (_jsxs(Flex, { gap: "2", justify: "center", children: [_jsx(CopyButton, { text: prompt, disabled: !prompt.trim(), label: "Copy Original" }), _jsx(CopyButton, { text: improvedPrompt, disabled: !improvedPrompt.trim(), label: "Copy Improved" })] }));
+import { Button, Flex, Tooltip } from '@radix-ui/themes';
+const Toolbar = ({ onScore, onOptimize, onCopyOriginal, onCopyImproved, disabled, loading }) => {
+    return (_jsxs(Flex, { gap: "2", style: { marginBottom: '16px' }, children: [_jsx(Button, { onClick: onScore, disabled: disabled.score, variant: "solid", style: { flex: 1 }, "aria-label": "Score current prompt", children: loading.scoring ? 'Scoring...' : 'Score' }), _jsx(Button, { onClick: onOptimize, disabled: disabled.optimize, variant: "solid", style: { flex: 1 }, "aria-label": "Optimize current prompt", children: loading.optimizing ? 'Optimizing...' : 'Optimize' }), _jsx(Tooltip, { content: "Copy original prompt to clipboard", children: _jsx(Button, { onClick: onCopyOriginal, disabled: disabled.copyOriginal, variant: "outline", size: "2", "aria-label": "Copy original prompt", children: "Copy Original" }) }), _jsx(Tooltip, { content: "Copy improved prompt to clipboard", children: _jsx(Button, { onClick: onCopyImproved, disabled: disabled.copyImproved, variant: "outline", size: "2", "aria-label": "Copy improved prompt", children: "Copy Improved" }) })] }));
 };
 export default Toolbar;

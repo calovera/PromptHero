@@ -1,53 +1,66 @@
 import React from 'react';
-import { Card, Text, Flex, Badge } from '@radix-ui/themes';
+import { Card, Text, Badge, Flex } from '@radix-ui/themes';
+import { Score } from '../../lib/schema';
 
 interface ScorePanelProps {
-  score: number | null;
+  title: string;
+  score?: Score;
 }
 
-const ScorePanel: React.FC<ScorePanelProps> = ({ score }) => {
+const ScorePanel: React.FC<ScorePanelProps> = ({ title, score }) => {
+  if (!score) {
+    return (
+      <Card style={{ padding: '16px' }}>
+        <Text size="2" weight="medium" style={{ marginBottom: '8px', display: 'block' }}>
+          {title}
+        </Text>
+        <Text size="1" style={{ color: 'var(--gray-11)' }}>
+          No score yet
+        </Text>
+      </Card>
+    );
+  }
+
   const getScoreColor = (score: number) => {
-    if (score >= 8) return 'green';
-    if (score >= 6) return 'yellow';
-    if (score >= 4) return 'orange';
+    if (score >= 80) return 'green';
+    if (score >= 60) return 'yellow';
     return 'red';
   };
 
-  const getScoreLabel = (score: number) => {
-    if (score >= 8) return 'Excellent';
-    if (score >= 6) return 'Good';
-    if (score >= 4) return 'Fair';
-    return 'Needs Improvement';
-  };
-
   return (
-    <Card>
-      <Flex direction="column" gap="2">
-        <Text size="2" weight="medium">
-          Prompt Score
-        </Text>
-        
-        {score !== null ? (
-          <Flex align="center" gap="2">
-            <Text size="6" weight="bold">
-              {score}/10
-            </Text>
-            <Badge color={getScoreColor(score)} variant="soft">
-              {getScoreLabel(score)}
-            </Badge>
-          </Flex>
-        ) : (
-          <Text size="2" color="gray">
-            No score yet
-          </Text>
-        )}
-        
-        {score !== null && (
-          <Text size="1" color="gray">
-            This score reflects clarity, specificity, and potential effectiveness of your prompt.
-          </Text>
-        )}
+    <Card style={{ padding: '16px' }}>
+      <Flex justify="between" align="center" style={{ marginBottom: '12px' }}>
+        <Text size="2" weight="medium">{title}</Text>
+        <Badge size="2" color={getScoreColor(score.score)}>
+          {score.score}/100
+        </Badge>
       </Flex>
+      
+      {score.issues.length > 0 && (
+        <div style={{ marginBottom: '12px' }}>
+          <Text size="1" weight="medium" style={{ color: 'var(--red-11)', marginBottom: '6px', display: 'block' }}>
+            Issues:
+          </Text>
+          {score.issues.map((issue, idx) => (
+            <Text key={idx} size="1" style={{ display: 'block', marginLeft: '8px', marginBottom: '2px' }}>
+              • {issue}
+            </Text>
+          ))}
+        </div>
+      )}
+      
+      {score.suggestions.length > 0 && (
+        <div>
+          <Text size="1" weight="medium" style={{ color: 'var(--green-11)', marginBottom: '6px', display: 'block' }}>
+            Suggestions:
+          </Text>
+          {score.suggestions.map((suggestion, idx) => (
+            <Text key={idx} size="1" style={{ display: 'block', marginLeft: '8px', marginBottom: '2px' }}>
+              • {suggestion}
+            </Text>
+          ))}
+        </div>
+      )}
     </Card>
   );
 };

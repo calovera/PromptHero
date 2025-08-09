@@ -1,0 +1,109 @@
+Implement the Popup and Options UI using Radix Themes in dark mode. Wire to background functions from Part 2. Add accessibility, error states, and history.
+
+# Popup (src/popup/Popup.tsx)
+- Wrap in <Theme appearance="dark">
+- Layout:
+  - Header: Title "Prompt Optimizer" and a subtle Button "Open Options" that calls chrome.runtime.openOptionsPage()
+  - <PromptEditor /> with:
+    - Radix TextArea rows=10
+    - Character count
+    - Preset chips row: "Coding", "Data extraction", "Brainstorm", "Customer support"
+    - Clear button
+  - <Toolbar /> with primary Buttons: "Score", "Optimize" and secondary Copy buttons: "Copy Original", "Copy Improved"
+  - Panels area:
+    - <ScorePanel title="Current score" /> for original
+    - <ImprovedPanel /> shows improved_prompt with Copy button and checklist
+    - <ScorePanel title="New score" /> for improved
+  - <HistoryList /> in a ScrollArea, last 10 entries with a "Load" menu to load original or improved
+
+# Popup behavior
+- If textarea empty on Score or Optimize, show Radix Callout "Paste a prompt first"
+- Score:
+  - disable buttons while loading
+  - call scorePromptViaBg
+  - render score, issues, suggestions
+  - save history entry with original and originalScore
+- Optimize:
+  - disable buttons while loading
+  - call optimizePromptViaBg
+  - render improved prompt and checklist
+  - automatically call scorePromptViaBg on improved prompt and render "New score"
+  - save history entry with original, originalScore (if present), improved, improvedScore
+- Copy buttons use navigator.clipboard.writeText with a Toast "Copied"
+
+# Components
+
+## PromptEditor.tsx
+Props: value, onChange, onClear, onPresetSelect
+- TextArea with placeholder "Paste your prompt…"
+- Under it, show small text with character count
+- Preset chips insert templates:
+  - Coding:
+    "You are a senior engineer. Goal: <<task>>. Inputs I will provide. Steps to follow. Constraints. Output format: code block then short explanation."
+  - Data extraction:
+    "Extract structured fields from unstructured text. Goal. Required fields with types. Validation rules. Output format: strict JSON schema."
+  - Brainstorm:
+    "Generate 10 ideas. Constraints. Audience. Must-include. Output as numbered list with one-line rationales."
+  - Customer support:
+    "Act as support agent. Goal. Tone. Required checks. Escalation rules. Output: greeting, resolution steps, closing."
+
+## ScorePanel.tsx
+Props: title, score?: Score
+- If no score, show muted "No score yet"
+- Else show a big numeric badge and two lists: issues and suggestions
+
+## ImprovedPanel.tsx
+Props: improved?: string, checklist?: string[]
+- If empty, show muted "No improved prompt yet"
+- Else show a read-only TextArea or <pre> block with mono font and Copy button
+- Checklist as a bullet list
+
+## HistoryList.tsx
+Props: entries: HistoryEntry[], onLoad: (entry, which: "original" | "improved") => void
+- Each row: timestamp, originalScore?.score, improvedScore?.score
+- "Load" menu lets user choose original or improved
+
+## Toolbar.tsx
+Props: onScore, onOptimize, onCopyOriginal, onCopyImproved, disabled flags
+- Radix Button group
+- Tooltips "Copy to clipboard"
+
+# Options (src/options/Options.tsx)
+- Card "Gemini API key"
+- TextField bound to local state
+- Buttons:
+  - Save -> setKey -> Toast "Saved"
+  - Test -> minimal callGemini test -> Toast success or error
+- Small privacy text: key stored locally via chrome.storage; prompts go from browser to Google; extension does not store prompts unless user opens History
+
+# Error and empty states
+- If background returns { ok: false }, show Radix Callout with the message and keep previous results
+- If key missing, show a persistent Callout with a Button "Open Options"
+- Add a retry on JSON parse handled in background (already done in Part 2); surface a Toast "Model returned invalid JSON, retried once"
+
+# Accessibility
+- aria-labels for all buttons
+- focus rings visible
+- keyboard navigable chips and menus
+
+# README finalization
+- Features list
+- Install steps
+- Load unpacked instructions
+- Set API key in Options
+- Usage guide with screenshots placeholders
+- Privacy and troubleshooting:
+  - 401/403 -> check key
+  - Parse errors -> retry or reduce prompt length
+  - Service worker logs -> chrome://extensions Inspect
+
+# Build polish
+- Ensure "build" emits:
+  - dist/manifest.json
+  - dist/popup/index.html and assets
+  - dist/options/index.html and assets
+  - dist/background/background.js
+  - dist/icons/*
+- "zip" script creates /release/prompt-optimizer.zip
+
+After this part, the extension should fully work: paste prompt, press Score to get score and explanation, press Optimize to get improved prompt and new score, copy with one click, browse history. Dark theme with Radix UI.

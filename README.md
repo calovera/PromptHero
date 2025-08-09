@@ -1,144 +1,145 @@
-# PromptHero - AI Prompt Optimizer
+# PromptHero - AI Prompt Optimization Extension
 
-A Chrome extension that helps you optimize AI prompts using Google's Gemini AI. Get real-time scoring and improvement suggestions for your prompts to make them more effective and specific.
+PromptHero is a powerful Chrome extension that helps you optimize your AI prompts using Google's Gemini AI. Get instant scoring, detailed feedback, and AI-powered improvements for better results with any AI model.
 
-## Features
+## ✨ Features
 
-- **AI-Powered Scoring**: Get 1-10 ratings for prompt clarity, specificity, and effectiveness
-- **Smart Optimization**: Receive improved versions of your prompts with detailed explanations
-- **History Tracking**: Keep track of your prompt iterations and improvements
-- **Dark Theme**: Beautiful, modern UI using Radix UI components
-- **Privacy-First**: API keys stored locally, never shared with third parties
-- **Real-time Feedback**: Instant scoring and optimization using Gemini AI
+- **Instant Prompt Scoring**: Get a 1-100 score with detailed feedback on prompt quality
+- **AI-Powered Optimization**: Automatically improve your prompts with specific suggestions
+- **Beautiful Dark Theme**: Modern UI built with Radix UI components
+- **Smart Loading Animations**: Lottie animations show when AI is working
+- **Prompt Presets**: Quick templates for coding, data extraction, brainstorming, and customer support
+- **History Tracking**: Keep track of all your prompt iterations
+- **One-Click Copy**: Easily copy original or improved prompts
+- **Privacy-First**: All data stored locally, API key never shared
 
-## Installation & Setup
+## 🚀 Installation
 
-### Prerequisites
+### From Chrome Web Store (Coming Soon)
+*Extension will be available on the Chrome Web Store soon*
 
-- Node.js 18+ and npm
-- Chrome browser
-- Gemini API key (free from Google AI Studio)
+### Manual Installation (Developer Mode)
+1. Download or clone this repository
+2. Open Chrome and navigate to `chrome://extensions/`
+3. Enable "Developer mode" in the top right corner
+4. Click "Load unpacked" and select the `./dist` folder
+5. The PromptHero extension should appear in your toolbar
 
-### Development Setup
+## ⚙️ Setup
 
-1. Install dependencies:
+1. **Get a Gemini API Key**:
+   - Visit [Google AI Studio](https://aistudio.google.com/app/apikey)
+   - Create a free API key
+   - Copy the key (starts with `AIza...`)
+
+2. **Configure PromptHero**:
+   - Click the PromptHero extension icon
+   - Click "Open Options"
+   - Paste your API key and click "Save"
+   - Click "Test" to verify it's working
+
+## 📖 Usage Guide
+
+### Basic Workflow
+1. **Enter a Prompt**: Type or paste your AI prompt in the text area
+2. **Score Your Prompt**: Click "Score" to get quality analysis (1-100 rating)
+3. **Optimize**: Click "Optimize" to get an AI-improved version
+4. **Copy & Use**: Click "Copy" to copy the improved prompt to your clipboard
+
+### Quick Presets
+Use the preset chips for common prompt types:
+- **Coding**: Structured prompts for development tasks
+- **Data extraction**: Prompts for extracting structured data
+- **Brainstorm**: Creative ideation prompts
+- **Customer support**: Professional support interaction prompts
+
+### History Management
+- All prompt iterations are automatically saved
+- Browse recent history at the bottom of the popup
+- Load any previous prompt (original or improved version)
+- History is synced across your Chrome browsers
+
+## 🎨 Screenshots
+
+*Screenshots will be added here showing the extension in action*
+
+## 🔒 Privacy & Security
+
+- **Local Storage**: Your API key is stored securely in Chrome's local storage
+- **No Data Collection**: PromptHero doesn't collect or store your prompts
+- **Direct API Calls**: Prompts are sent directly from your browser to Google's Gemini API
+- **HTTPS Only**: All communication uses secure HTTPS connections
+
+## 🛠️ Troubleshooting
+
+### Common Issues
+
+**"API key not configured" error**
+- Solution: Go to Options and enter your Gemini API key
+
+**"Failed to score/optimize prompt" error**
+- Check your internet connection
+- Verify your API key is valid and has quota remaining
+- Try with a shorter prompt (API has length limits)
+
+**Extension not loading**
+- Make sure you're using Chrome 88+ with Manifest V3 support
+- Try disabling and re-enabling the extension
+
+### Debug Information
+To get detailed error logs:
+1. Go to `chrome://extensions/`
+2. Find PromptHero and click "Inspect views: service worker"
+3. Check the Console tab for error messages
+
+## 🔧 Development
+
+### Build from Source
 ```bash
+# Install dependencies
 npm install
-```
 
-2. Build the extension:
-```bash
+# Build extension
 ./build.sh
+
+# The built extension will be in ./dist/
 ```
 
-3. Set up development environment (with your API key):
-```bash
-node setup-dev.js
+### Project Structure
+```
+├── src/
+│   ├── popup/           # Main popup interface
+│   ├── options/         # Options/settings page
+│   ├── background/      # Service worker & API logic
+│   ├── lib/            # Shared utilities & schemas
+│   └── animations/     # Lottie animation files
+├── dist/               # Built extension files
+└── web-demo/          # Web demo for testing
 ```
 
-### Getting Your Gemini API Key
-
-1. Visit [Google AI Studio](https://aistudio.google.com/app/apikey)
-2. Sign in with your Google account
-3. Click "Create API Key"
-4. Copy the generated key (starts with "AIza...")
-
-### Loading the Extension in Chrome
-
-1. Open Chrome and navigate to `chrome://extensions/`
-2. Enable "Developer mode" in the top right corner
-3. Click "Load unpacked"
-4. Select the `./dist` folder from this project
-5. The PromptHero icon should appear in your browser toolbar
-
-## How to Use
-
-### Setting Up Your API Key
-
-1. Click the PromptHero extension icon in your toolbar
-2. Click "Options" in the popup
-3. Enter your Gemini API key
-4. Click "Save" and "Test" to verify it works
-
-### Scoring Prompts
-
-1. Click the PromptHero extension icon
-2. Enter your prompt in the text area
-3. Click "Score" to get a 1-10 rating with detailed feedback
-4. Review the suggestions for improvement
-
-### Optimizing Prompts
-
-1. Enter your prompt in the text area
-2. Click "Optimize" to get an improved version
-3. Review the changes and reasoning provided
-4. Copy the improved prompt to use in your AI applications
-
-### Managing History
-
-- All scored and optimized prompts are automatically saved
-- View your history in the bottom section of the popup
-- Clear history from the options page if needed
-
-## Architecture
-
-### Technology Stack
-
-- **Frontend**: React 18 + TypeScript
-- **UI Components**: Radix UI with dark theme
-- **Build Tool**: TypeScript compiler with custom build script
-- **AI Integration**: Google Gemini API via @google/genai
-- **Storage**: Chrome Sync Storage API
+### Tech Stack
+- **Framework**: React with TypeScript
+- **UI Library**: Radix UI with dark theme
+- **Build Tool**: Vite for fast development
+- **Animations**: Lottie React for smooth loading states
 - **Validation**: Zod for runtime type safety
+- **AI Service**: Google Gemini API
 
-### File Structure
+## 📝 License
 
-```
-src/
-├── popup/                 # Main extension popup
-│   ├── components/        # React components
-│   ├── index.html        # Popup HTML
-│   ├── index.tsx         # React entry point
-│   └── Popup.tsx         # Main popup component
-├── options/              # Extension options page
-│   ├── index.html        # Options HTML
-│   ├── index.tsx         # React entry point
-│   └── Options.tsx       # Options component
-├── background/           # Service worker
-│   ├── background.ts     # Main background script
-│   └── gemini.ts         # Gemini API integration
-└── lib/                  # Shared utilities
-    ├── messages.ts       # Message passing types
-    ├── schema.ts         # Zod validation schemas
-    ├── storage.ts        # Chrome storage helpers
-    └── ui.tsx            # Reusable UI components
-```
+MIT License - see [LICENSE](LICENSE) file for details.
 
-## Development Commands
+## 🤝 Contributing
 
-- `./build.sh` - Build the extension for Chrome
-- `node setup-dev.js` - Configure development environment
-- `npm run test` - Run tests (when implemented)
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-## Privacy & Security
+## 📞 Support
 
-- API keys are stored locally using Chrome's sync storage
-- No data is sent to third-party servers (except Google's Gemini API)
-- All prompt data remains on your device
-- Source code is open and auditable
+If you encounter any issues or have questions:
+1. Check the troubleshooting section above
+2. Open an issue on GitHub
+3. Make sure you have a valid Gemini API key with available quota
 
-## Contributing
+---
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test the extension thoroughly
-5. Submit a pull request
-
-## License
-
-MIT License - see LICENSE file for details
-
-## Support
-
-For issues or feature requests, please open an issue on GitHub.
+**Made with ❤️ for better AI interactions**

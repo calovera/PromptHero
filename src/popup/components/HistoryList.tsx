@@ -1,72 +1,111 @@
-import React, { useState, useEffect } from 'react';
-import { Card, Text, Box, Flex, Button, ScrollArea } from '@radix-ui/themes';
+import React from 'react';
+import { Card, Text, Badge, Flex, Button, ScrollArea, DropdownMenu } from '@radix-ui/themes';
+import { HistoryEntry } from '../../lib/schema';
 
-interface HistoryItem {
-  id: string;
-  originalPrompt: string;
-  improvedPrompt?: string;
-  score?: number;
-  timestamp: Date;
+interface HistoryListProps {
+  entries: HistoryEntry[];
+  onLoad: (entry: HistoryEntry, which: 'original' | 'improved') => void;
 }
 
-const HistoryList: React.FC = () => {
-  const [history, setHistory] = useState<HistoryItem[]>([]);
+const HistoryList: React.FC<HistoryListProps> = ({ entries, onLoad }) => {
+  if (entries.length === 0) {
+    return (
+      <Card style={{ padding: '16px' }}>
+        <Text size="2" weight="medium" style={{ marginBottom: '8px', display: 'block' }}>
+          History
+        </Text>
+        <Text size="1" style={{ color: 'var(--gray-11)' }}>
+          No history yet
+        </Text>
+      </Card>
+    );
+  }
 
-  useEffect(() => {
-    // TODO: Load history from chrome.storage
-    // loadHistoryFromStorage();
-  }, []);
+  const formatDate = (timestamp: number) => {
+    const date = new Date(timestamp);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / (1000 * 60));
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
-  const formatDate = (date: Date) => {
-    return new Intl.DateTimeFormat('en-US', {
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    }).format(date);
-  };
-
-  const truncateText = (text: string, maxLength: number = 60) => {
-    return text.length > maxLength ? text.slice(0, maxLength) + '...' : text;
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffDays < 7) return `${diffDays}d ago`;
+    return date.toLocaleDateString();
   };
 
   return (
-    <Card style={{ maxHeight: '200px' }}>
-      <Text size="2" weight="medium" mb="2" style={{ display: 'block' }}>
-        Recent History
+    <Card style={{ padding: '16px' }}>
+      <Text size="2" weight="medium" style={{ marginBottom: '12px', display: 'block' }}>
+        History ({entries.length})
       </Text>
       
-      {history.length > 0 ? (
-        <ScrollArea style={{ height: '160px' }}>
-          <Flex direction="column" gap="2">
-            {history.map((item) => (
-              <Box key={item.id} p="2" style={{ backgroundColor: 'var(--gray-2)', borderRadius: 'var(--radius-2)' }}>
-                <Flex justify="between" align="start" gap="2">
-                  <Box style={{ flex: 1, minWidth: 0 }}>
-                    <Text size="1" style={{ display: 'block', wordBreak: 'break-word' }}>
-                      {truncateText(item.originalPrompt)}
-                    </Text>
-                    {item.score && (
-                      <Text size="1" color="gray">
-                        Score: {item.score}/10
-                      </Text>
-                    )}
-                  </Box>
-                  <Text size="1" color="gray" style={{ flexShrink: 0 }}>
-                    {formatDate(item.timestamp)}
+      <ScrollArea style={{ height: '200px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          {entries.slice(0, 10).map((entry, idx) => (
+            <div key={idx} style={{ 
+              padding: '8px', 
+              background: 'var(--gray-2)', 
+              borderRadius: '4px',
+              border: '1px solid var(--gray-5)'
+            }}>
+              <Text size="1" style={{ 
+                display: 'block', 
+                overflow: 'hidden', 
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                marginBottom: '6px'
+              }}>
+                {entry.original}
+              </Text>
+              
+              <Flex justify="between" align="center">
+                <Flex gap="2" align="center">
+                  <Text size="1" style={{ color: 'var(--gray-11)' }}>
+                    {formatDate(entry.timestamp)}
                   </Text>
+                  {entry.originalScore && (
+                    <Badge size="1" color="gray">
+                      {entry.originalScore.score}/100
+                    </Badge>
+                  )}
+                  {entry.improved && (
+                    <Badge size="1" color="green">
+                      Optimized
+                    </Badge>
+                  )}
                 </Flex>
-              </Box>
-            ))}
-          </Flex>
-        </ScrollArea>
-      ) : (
-        <Box p="3" style={{ backgroundColor: 'var(--gray-2)', borderRadius: 'var(--radius-2)' }}>
-          <Text size="2" color="gray">
-            No history yet. Start by scoring or optimizing a prompt!
-          </Text>
-        </Box>
-      )}
+                
+                <DropdownMenu.Root>
+                  <DropdownMenu.Trigger>
+                    <Button size="1" variant="ghost" aria-label="Load prompt options">
+                      Load
+                    </Button>
+                  </DropdownMenu.Trigger>
+                  <DropdownMenu.Content>
+                    <DropdownMenu.Item 
+                      onClick={() => onLoad(entry, 'original')}
+                      aria-label="Load original prompt"
+                    >
+                      Load Original
+                    </DropdownMenu.Item>
+                    {entry.improved && (
+                      <DropdownMenu.Item 
+                        onClick={() => onLoad(entry, 'improved')}
+                        aria-label="Load improved prompt"
+                      >
+                        Load Improved
+                      </DropdownMenu.Item>
+                    )}
+                  </DropdownMenu.Content>
+                </DropdownMenu.Root>
+              </Flex>
+            </div>
+          ))}
+        </div>
+      </ScrollArea>
     </Card>
   );
 };

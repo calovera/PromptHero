@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Theme, Button, Card, Text, Flex, TextArea, Badge, Separator } from '@radix-ui/themes';
+import { Theme, Button, Flex, Text, Callout } from '@radix-ui/themes';
 import '@radix-ui/themes/styles.css';
 import { Score, Optimize, HistoryEntry } from '../lib/schema';
 import { scorePromptViaBg, optimizePromptViaBg } from '../lib/messages';
@@ -7,23 +7,47 @@ import {
   saveWorkingState, 
   loadWorkingState, 
   saveHistory, 
-  loadHistory 
+  loadHistory,
+  getKey 
 } from '../lib/storage';
+
+// Components
+import PromptEditor from './components/PromptEditor';
+import ScorePanel from './components/ScorePanel';
+import ImprovedPanel from './components/ImprovedPanel';
+import HistoryList from './components/HistoryList';
+import Toolbar from './components/Toolbar';
+import LoadingAnimation from './components/LoadingAnimation';
+import Toast from './components/Toast';
 
 const Popup: React.FC = () => {
   const [prompt, setPrompt] = useState('');
-  const [currentScore, setCurrentScore] = useState<Score | null>(null);
-  const [improved, setImproved] = useState<string>('');
-  const [improvedScore, setImprovedScore] = useState<Score | null>(null);
-  const [optimizeResult, setOptimizeResult] = useState<Optimize | null>(null);
+  const [originalScore, setOriginalScore] = useState<Score | undefined>();
+  const [improvedPrompt, setImprovedPrompt] = useState<string>('');
+  const [improvedScore, setImprovedScore] = useState<Score | undefined>();
+  const [optimizeResult, setOptimizeResult] = useState<Optimize | undefined>();
+  const [history, setHistory] = useState<HistoryEntry[]>([]);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const [apiKeyConfigured, setApiKeyConfigured] = useState(true);
+  const [error, setError] = useState<string>('');
+  
+  // Loading states
   const [isScoring, setIsScoring] = useState(false);
   const [isOptimizing, setIsOptimizing] = useState(false);
-  const [history, setHistory] = useState<HistoryEntry[]>([]);
-  const [error, setError] = useState<string>('');
 
   useEffect(() => {
     loadInitialState();
+    checkApiKey();
   }, []);
+
+  const checkApiKey = async () => {
+    try {
+      const key = await getKey();
+      setApiKeyConfigured(!!key);
+    } catch (error) {
+      setApiKeyConfigured(false);
+    }
+  };
 
   const loadInitialState = async () => {
     try {
@@ -31,9 +55,9 @@ const Popup: React.FC = () => {
       const workingState = await loadWorkingState();
       if (workingState) {
         setPrompt(workingState.prompt);
-        setCurrentScore(workingState.currentScore || null);
-        setImproved(workingState.improved || '');
-        setImprovedScore(workingState.improvedScore || null);
+        setOriginalScore(workingState.currentScore);
+        setImprovedPrompt(workingState.improved || '');
+        setImprovedScore(workingState.improvedScore);
       }
 
       // Load history
@@ -46,7 +70,7 @@ const Popup: React.FC = () => {
 
   const handleScore = async () => {
     if (!prompt.trim()) {
-      setError('Please enter a prompt to score');
+      setError('Paste a prompt first');
       return;
     }
 
@@ -55,15 +79,27 @@ const Popup: React.FC = () => {
     
     try {
       const score = await scorePromptViaBg(prompt.trim());
-      setCurrentScore(score);
+      setOriginalScore(score);
       
       // Save working state
       await saveWorkingState({
         prompt: prompt.trim(),
         currentScore: score,
-        improved,
-        improvedScore: improvedScore || undefined
+        improved: improvedPrompt,
+        improvedScore: improvedScore
       });
+
+      // Save to history
+      const entry: HistoryEntry = {
+        original: prompt.trim(),
+        originalScore: score,
+        improved: improvedPrompt || undefined,
+        improvedScore: improvedScore,
+        timestamp: Date.now()
+      };
+      await saveHistory(entry);
+      const updatedHistory = await loadHistory();
+      setHistory(updatedHistory);
 
     } catch (error) {
       console.error('Score error:', error);
@@ -75,7 +111,7 @@ const Popup: React.FC = () => {
 
   const handleOptimize = async () => {
     if (!prompt.trim()) {
-      setError('Please enter a prompt to optimize');
+      setError('Paste a prompt first');
       return;
     }
 
@@ -85,15 +121,35 @@ const Popup: React.FC = () => {
     try {
       const result = await optimizePromptViaBg(prompt.trim());
       setOptimizeResult(result);
-      setImproved(result.improved_prompt);
+      setImprovedPrompt(result.improved_prompt);
+      
+      // Automatically score the improved prompt
+      try {
+        const newScore = await scorePromptViaBg(result.improved_prompt);
+        setImprovedScore(newScore);
+      } catch (scoreError) {
+        console.error('Failed to score improved prompt:', scoreError);
+      }
       
       // Save working state
       await saveWorkingState({
         prompt: prompt.trim(),
-        currentScore: currentScore || undefined,
+        currentScore: originalScore,
         improved: result.improved_prompt,
-        improvedScore: improvedScore || undefined
+        improvedScore: improvedScore
       });
+
+      // Save to history
+      const entry: HistoryEntry = {
+        original: prompt.trim(),
+        originalScore: originalScore,
+        improved: result.improved_prompt,
+        improvedScore: improvedScore,
+        timestamp: Date.now()
+      };
+      await saveHistory(entry);
+      const updatedHistory = await loadHistory();
+      setHistory(updatedHistory);
 
     } catch (error) {
       console.error('Optimize error:', error);
@@ -103,37 +159,47 @@ const Popup: React.FC = () => {
     }
   };
 
-  const handleSaveToHistory = async () => {
-    if (!prompt.trim()) return;
-
-    const entry: HistoryEntry = {
-      original: prompt.trim(),
-      originalScore: currentScore || undefined,
-      improved: improved || undefined,
-      improvedScore: improvedScore || undefined,
-      timestamp: Date.now()
-    };
-
+  const handleCopy = async (text: string, label: string) => {
     try {
-      await saveHistory(entry);
-      const updatedHistory = await loadHistory();
-      setHistory(updatedHistory);
+      await navigator.clipboard.writeText(text);
+      setToast({ message: `${label} copied!`, type: 'success' });
     } catch (error) {
-      console.error('Failed to save to history:', error);
+      console.error('Failed to copy:', error);
+      setToast({ message: 'Failed to copy', type: 'error' });
     }
   };
 
-  const copyToClipboard = async (text: string) => {
-    try {
-      await navigator.clipboard.writeText(text);
-    } catch (error) {
-      console.error('Failed to copy:', error);
+  const handlePresetSelect = (preset: string) => {
+    setPrompt(preset);
+  };
+
+  const handleClear = () => {
+    setPrompt('');
+    setOriginalScore(undefined);
+    setImprovedPrompt('');
+    setImprovedScore(undefined);
+    setOptimizeResult(undefined);
+    setError('');
+  };
+
+  const handleHistoryLoad = (entry: HistoryEntry, which: 'original' | 'improved') => {
+    if (which === 'original') {
+      setPrompt(entry.original);
+      setOriginalScore(entry.originalScore);
+    } else if (which === 'improved' && entry.improved) {
+      setPrompt(entry.improved);
+      setOriginalScore(entry.improvedScore);
     }
+    setImprovedPrompt('');
+    setImprovedScore(undefined);
+    setOptimizeResult(undefined);
   };
 
   const openOptions = () => {
     chrome.runtime.openOptionsPage();
   };
+
+  const isLoading = isScoring || isOptimizing;
 
   return (
     <Theme
@@ -144,168 +210,98 @@ const Popup: React.FC = () => {
       scaling="95%"
     >
       <div style={{ width: '400px', height: '600px', padding: '16px', overflow: 'auto' }}>
+        {toast && (
+          <Toast 
+            message={toast.message} 
+            type={toast.type} 
+            onClose={() => setToast(null)} 
+          />
+        )}
+
         <Flex direction="column" gap="4" style={{ height: '100%' }}>
           {/* Header */}
           <Flex justify="between" align="center">
-            <Text size="5" weight="bold">PromptHero</Text>
+            <Text size="5" weight="bold">Prompt Optimizer</Text>
             <Button size="1" variant="ghost" onClick={openOptions}>
-              Options
+              Open Options
             </Button>
           </Flex>
+
+          {/* API Key Warning */}
+          {!apiKeyConfigured && (
+            <Callout.Root color="red">
+              <Callout.Text>
+                API key not configured.{' '}
+                <Button variant="ghost" size="1" onClick={openOptions}>
+                  Open Options
+                </Button>
+              </Callout.Text>
+            </Callout.Root>
+          )}
 
           {/* Error Display */}
           {error && (
-            <Card style={{ padding: '12px', background: 'var(--red-3)', border: '1px solid var(--red-6)' }}>
-              <Text size="1" style={{ color: 'var(--red-11)' }}>{error}</Text>
-            </Card>
+            <Callout.Root color="red">
+              <Callout.Text>{error}</Callout.Text>
+            </Callout.Root>
           )}
 
-          {/* Prompt Input */}
-          <div>
-            <Text size="2" weight="medium" style={{ marginBottom: '8px', display: 'block' }}>
-              Enter your prompt:
-            </Text>
-            <TextArea
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
-              placeholder="Type your AI prompt here..."
-              style={{ minHeight: '100px', width: '100%' }}
-              size="2"
-            />
-          </div>
-
-          {/* Action Buttons */}
-          <Flex gap="2">
-            <Button 
-              onClick={handleScore}
-              disabled={isScoring || !prompt.trim()}
-              variant="solid"
-              style={{ flex: 1 }}
-            >
-              {isScoring ? 'Scoring...' : 'Score'}
-            </Button>
-            <Button 
-              onClick={handleOptimize}
-              disabled={isOptimizing || !prompt.trim()}
-              variant="outline"
-              style={{ flex: 1 }}
-            >
-              {isOptimizing ? 'Optimizing...' : 'Optimize'}
-            </Button>
-          </Flex>
-
-          {/* Score Results */}
-          {currentScore && (
-            <Card style={{ padding: '12px' }}>
-              <Flex justify="between" align="center" style={{ marginBottom: '8px' }}>
-                <Text size="2" weight="medium">Score</Text>
-                <Badge size="2" color="blue">{currentScore.score}/100</Badge>
-              </Flex>
-              
-              {currentScore.issues.length > 0 && (
-                <div style={{ marginBottom: '8px' }}>
-                  <Text size="1" weight="medium" style={{ color: 'var(--red-11)' }}>Issues:</Text>
-                  {currentScore.issues.map((issue, idx) => (
-                    <Text key={idx} size="1" style={{ display: 'block', marginLeft: '8px' }}>
-                      • {issue}
-                    </Text>
-                  ))}
-                </div>
-              )}
-              
-              {currentScore.suggestions.length > 0 && (
-                <div>
-                  <Text size="1" weight="medium" style={{ color: 'var(--green-11)' }}>Suggestions:</Text>
-                  {currentScore.suggestions.map((suggestion, idx) => (
-                    <Text key={idx} size="1" style={{ display: 'block', marginLeft: '8px' }}>
-                      • {suggestion}
-                    </Text>
-                  ))}
-                </div>
-              )}
-            </Card>
+          {/* Loading Animation */}
+          {isScoring && (
+            <LoadingAnimation message="Analyzing your prompt..." />
+          )}
+          
+          {isOptimizing && (
+            <LoadingAnimation message="Optimizing your prompt..." />
           )}
 
-          {/* Optimization Results */}
-          {optimizeResult && (
-            <Card style={{ padding: '12px' }}>
-              <Flex justify="between" align="center" style={{ marginBottom: '8px' }}>
-                <Text size="2" weight="medium">Improved Prompt</Text>
-                <Button 
-                  size="1" 
-                  variant="ghost" 
-                  onClick={() => copyToClipboard(optimizeResult.improved_prompt)}
-                >
-                  Copy
-                </Button>
-              </Flex>
-              
-              <Text size="1" style={{ 
-                background: 'var(--gray-3)', 
-                padding: '8px', 
-                borderRadius: '4px', 
-                display: 'block',
-                lineHeight: '1.4',
-                marginBottom: '8px'
-              }}>
-                {optimizeResult.improved_prompt}
-              </Text>
-              
-              {optimizeResult.checklist.length > 0 && (
-                <div>
-                  <Text size="1" weight="medium">Improvements made:</Text>
-                  {optimizeResult.checklist.map((item, idx) => (
-                    <Text key={idx} size="1" style={{ display: 'block', marginLeft: '8px' }}>
-                      ✓ {item}
-                    </Text>
-                  ))}
-                </div>
-              )}
-            </Card>
-          )}
+          {/* Prompt Editor */}
+          <PromptEditor
+            value={prompt}
+            onChange={setPrompt}
+            onClear={handleClear}
+            onPresetSelect={handlePresetSelect}
+            disabled={isLoading}
+          />
 
-          {/* Save to History */}
-          {(currentScore || optimizeResult) && (
-            <Button 
-              onClick={handleSaveToHistory}
-              variant="soft"
-              size="1"
-            >
-              Save to History
-            </Button>
+          {/* Toolbar */}
+          <Toolbar
+            onScore={handleScore}
+            onOptimize={handleOptimize}
+            onCopyOriginal={() => handleCopy(prompt, 'Original prompt')}
+            onCopyImproved={() => handleCopy(improvedPrompt, 'Improved prompt')}
+            disabled={{
+              score: !prompt.trim() || isLoading || !apiKeyConfigured,
+              optimize: !prompt.trim() || isLoading || !apiKeyConfigured,
+              copyOriginal: !prompt.trim(),
+              copyImproved: !improvedPrompt
+            }}
+            loading={{
+              scoring: isScoring,
+              optimizing: isOptimizing
+            }}
+          />
+
+          {/* Score Panels */}
+          <ScorePanel title="Current score" score={originalScore} />
+          
+          {/* Improved Panel */}
+          <ImprovedPanel
+            improved={improvedPrompt}
+            checklist={optimizeResult?.checklist}
+            onCopy={(text) => handleCopy(text, 'Improved prompt')}
+          />
+          
+          {/* New Score Panel */}
+          {improvedPrompt && (
+            <ScorePanel title="New score" score={improvedScore} />
           )}
 
           {/* History */}
-          {history.length > 0 && (
-            <div>
-              <Separator style={{ margin: '8px 0' }} />
-              <Text size="2" weight="medium" style={{ marginBottom: '8px', display: 'block' }}>
-                Recent History ({history.length})
-              </Text>
-              <div style={{ maxHeight: '120px', overflow: 'auto' }}>
-                {history.slice(0, 3).map((entry, idx) => (
-                  <Card key={idx} style={{ padding: '8px', marginBottom: '4px' }}>
-                    <Text size="1" style={{ 
-                      display: 'block', 
-                      overflow: 'hidden', 
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap'
-                    }}>
-                      {entry.original}
-                    </Text>
-                    <Flex gap="2" style={{ marginTop: '4px' }}>
-                      {entry.originalScore && (
-                        <Badge size="1" color="gray">{entry.originalScore.score}/100</Badge>
-                      )}
-                      {entry.improved && (
-                        <Badge size="1" color="green">Optimized</Badge>
-                      )}
-                    </Flex>
-                  </Card>
-                ))}
-              </div>
-            </div>
-          )}
+          <HistoryList
+            entries={history}
+            onLoad={handleHistoryLoad}
+          />
         </Flex>
       </div>
     </Theme>
