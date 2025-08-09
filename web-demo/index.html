@@ -205,8 +205,29 @@
             border-radius: 0 0 8px 8px;
             border-top: none;
             padding: 16px;
-            min-height: 300px;
+            max-height: 450px;
+            overflow-y: auto;
             backdrop-filter: blur(10px);
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255,255,255,0.3) transparent;
+        }
+        
+        .tab-content::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .tab-content::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+        }
+        
+        .tab-content::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.3);
+            border-radius: 4px;
+        }
+        
+        .tab-content::-webkit-scrollbar-thumb:hover {
+            background: rgba(255,255,255,0.5);
         }
         
         @media (max-width: 768px) {
@@ -231,13 +252,33 @@
             border-radius: 8px;
             padding: 16px;
             margin: 12px 0;
-            min-height: 160px;
+            max-height: 200px;
+            overflow-y: auto;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             line-height: 1.6;
             font-size: 14px;
             color: var(--text-readable);
             backdrop-filter: blur(15px);
             position: relative;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255,255,255,0.3) transparent;
+        }
+        
+        .streaming-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .streaming-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        .streaming-container::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.3);
+            border-radius: 3px;
+        }
+        
+        .streaming-container::-webkit-scrollbar-thumb:hover {
+            background: rgba(255,255,255,0.5);
         }
         
         .streaming-container::before {
@@ -530,23 +571,28 @@
         #streamingPrompt, #streamingExplanation {
             color: var(--text-readable);
             word-wrap: break-word;
-            line-height: 1.6;
-            font-size: 14px;
+            line-height: 1.5;
+            font-size: 13px;
+            white-space: pre-wrap;
         }
         
         #streamingPrompt p, #streamingExplanation p {
-            margin: 8px 0;
-            line-height: 1.6;
+            margin: 6px 0;
+            line-height: 1.5;
+            color: var(--text-readable);
         }
         
         #streamingPrompt ul, #streamingExplanation ul {
-            margin: 8px 0;
-            padding-left: 20px;
+            margin: 6px 0;
+            padding-left: 18px;
+            list-style-type: disc;
         }
         
         #streamingPrompt li, #streamingExplanation li {
-            margin: 4px 0;
-            line-height: 1.5;
+            margin: 3px 0;
+            line-height: 1.4;
+            color: var(--text-readable);
+            display: list-item;
         }
         
         #streamingPrompt strong, #streamingExplanation strong {
@@ -556,14 +602,17 @@
         
         #streamingPrompt em, #streamingExplanation em {
             color: var(--text-secondary);
+            font-style: italic;
         }
         
         #streamingPrompt code, #streamingExplanation code {
-            background: rgba(255,255,255,0.2);
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-family: monospace;
-            font-size: 13px;
+            background: rgba(255,255,255,0.25);
+            color: var(--text-primary);
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: 'Courier New', Consolas, monospace;
+            font-size: 12px;
+            font-weight: 500;
         }
         
         .explanation-section {
@@ -572,8 +621,29 @@
             border-radius: 8px;
             padding: 16px;
             margin-top: 12px;
+            max-height: 200px;
+            overflow-y: auto;
             line-height: 1.6;
             backdrop-filter: blur(15px);
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255,255,255,0.3) transparent;
+        }
+        
+        .explanation-section::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .explanation-section::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        .explanation-section::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.3);
+            border-radius: 3px;
+        }
+        
+        .explanation-section::-webkit-scrollbar-thumb:hover {
+            background: rgba(255,255,255,0.5);
         }
         
         .explanation-section h3 {
