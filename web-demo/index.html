@@ -917,21 +917,21 @@
                 </div>
                 
                 <div id="optimizedTab" class="tab-pane">
-                    <div id="streamingAnimation" class="loading" style="position: relative; top: 20px; margin-bottom: 20px;">
+                    <div id="streamingAnimation" class="loading" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9999; background: rgba(0,0,0,0.9); border-radius: 12px; padding: 30px 40px; backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.2);">
                         <div id="streamingSpinner" class="loading-spinner optimize">
                             <div class="loading-icon">⚡</div>
                         </div>
-                        <p>Creating your improved prompt...</p>
+                        <p style="color: white; font-weight: 500; margin-top: 15px;">Creating your improved prompt...</p>
                         <p style="color: #888; font-size: 14px; margin-top: 8px;">Processing with Gemini AI</p>
                     </div>
                     
+                    <div class="section-title">Improved Prompt:</div>
                     <div class="streaming-container">
-                        <div class="section-title">Improved Prompt:</div>
                         <div id="streamingPrompt" class="streaming-text"></div>
                         <span id="promptCursor" class="typing-cursor">|</span>
                     </div>
                     
-                    <h4 class="section-title">What was improved:</h4>
+                    <div class="section-title">What was improved:</div>
                     <div class="explanation-section">
                         <div id="streamingExplanation" class="streaming-text"></div>
                         <span id="explanationCursor" class="typing-cursor" style="display: none;">|</span>
@@ -1078,7 +1078,8 @@
                 const streamingPrompt = document.getElementById('streamingPrompt');
                 streamingPrompt.innerHTML += data.text;
             } else if (data.type === 'complete') {
-                // Parse and display the final structured response
+                // Hide animation and parse the final structured response
+                document.getElementById('streamingAnimation').style.display = 'none';
                 document.getElementById('streamingPrompt').innerHTML = formatMarkdown(data.optimizedPrompt) || data.optimizedPrompt;
                 document.getElementById('streamingExplanation').innerHTML = formatMarkdown(data.explanation) || data.explanation;
                 document.getElementById('copyBtn').style.display = 'inline-block';
@@ -1086,7 +1087,7 @@
                 isStreaming = false;
             } else if (data.type === 'error') {
                 showError(data.error);
-                document.getElementById('streamingAnimation').classList.remove('show');
+                document.getElementById('streamingAnimation').style.display = 'none';
                 isStreaming = false;
             }
         }
@@ -1218,7 +1219,7 @@
             
             // Switch to optimized tab and show streaming animation
             switchTab('optimized');
-            document.getElementById('streamingAnimation').classList.add('show');
+            document.getElementById('streamingAnimation').style.display = 'block';
             document.getElementById('streamingPrompt').innerHTML = '';
             document.getElementById('streamingExplanation').innerHTML = '';
             document.getElementById('copyBtn').style.display = 'none';
