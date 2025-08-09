@@ -10,11 +10,11 @@ app.use(express.static(path.join(__dirname)));
 app.use('/dist', express.static(path.join(__dirname, '..', 'dist')));
 
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'test.html'));
+    res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-app.get('/demo', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
+app.get('/test', (req, res) => {
+    res.sendFile(path.join(__dirname, 'test.html'));
 });
 
 // Test API key endpoint

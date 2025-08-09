@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PromptHero - Extension Demo</title>
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-    <link rel="stylesheet" href="../dist/popup/index.css">
+    <link rel="stylesheet" href="https://unpkg.com/@radix-ui/themes@3/styles.css">
     <style>
         * {
             margin: 0;
@@ -175,9 +173,60 @@
         }
         
         .loading {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #1a1a1a;
+            border: 2px solid #0066cc;
+            border-radius: 12px;
+            padding: 30px;
             text-align: center;
-            color: #888;
-            padding: 20px;
+            z-index: 1000;
+            min-width: 250px;
+        }
+        
+        .loading.show {
+            display: block;
+        }
+        
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 15px;
+            background: linear-gradient(45deg, #0066cc, #0052a3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: spin 2s linear infinite;
+        }
+        
+        .loading-spinner.optimize {
+            background: linear-gradient(45deg, #10b981, #059669);
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        
+        .loading-icon {
+            font-size: 24px;
+            background: #1a1a1a;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
         }
         
         .error {
@@ -271,8 +320,12 @@
             <button onclick="copyOptimized()" class="copy-btn">Copy to Clipboard</button>
         </div>
         
-        <div id="loading" class="loading" style="display: none;">
-            <p>Processing with Gemini AI...</p>
+        <div id="loading" class="loading">
+            <div id="loadingSpinner" class="loading-spinner">
+                <div class="loading-icon" id="loadingIcon">📊</div>
+            </div>
+            <p id="loadingMessage">Analyzing your prompt...</p>
+            <p style="color: #888; font-size: 14px; margin-top: 8px;">This might take a few seconds</p>
         </div>
     </div>
 
@@ -304,8 +357,27 @@
             setTimeout(() => successDiv.style.display = 'none', 3000);
         }
         
-        function showLoading(show) {
-            document.getElementById('loading').style.display = show ? 'block' : 'none';
+        function showLoading(show, type = 'score') {
+            const loading = document.getElementById('loading');
+            const spinner = document.getElementById('loadingSpinner');
+            const icon = document.getElementById('loadingIcon');
+            const message = document.getElementById('loadingMessage');
+            
+            if (show) {
+                loading.classList.add('show');
+                if (type === 'optimize') {
+                    spinner.classList.add('optimize');
+                    icon.textContent = '⚡';
+                    message.textContent = 'Creating your improved prompt...';
+                } else {
+                    spinner.classList.remove('optimize');
+                    icon.textContent = '📊';
+                    message.textContent = 'Analyzing your prompt...';
+                }
+            } else {
+                loading.classList.remove('show');
+            }
+            
             document.getElementById('scoreBtn').disabled = show;
             document.getElementById('optimizeBtn').disabled = show;
         }
@@ -356,7 +428,7 @@
                 return;
             }
             
-            showLoading(true);
+            showLoading(true, 'score');
             
             try {
                 const response = await fetch('/api/score', {
@@ -393,7 +465,7 @@
                 return;
             }
             
-            showLoading(true);
+            showLoading(true, 'optimize');
             
             try {
                 const response = await fetch('/api/optimize', {
