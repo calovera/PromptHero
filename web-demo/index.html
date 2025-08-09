@@ -24,9 +24,10 @@
             --navy-light: #353570;
             --accent-cyan: #06b6d4;
             --accent-pink: #ec4899;
-            --text-primary: #f1f5f9;
-            --text-secondary: #cbd5e1;
-            --text-muted: #94a3b8;
+            --text-primary: #ffffff;
+            --text-secondary: #e2e8f0;
+            --text-muted: #cbd5e1;
+            --text-readable: #f8fafc;
             --success-green: #10b981;
             --error-red: #ef4444;
             --glass-bg: rgba(255, 255, 255, 0.08);
@@ -70,9 +71,9 @@
         }
         
         .container {
-            background: rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.15);
             backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.18);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 12px;
             padding: 20px;
             width: 100%;
@@ -199,8 +200,8 @@
         }
         
         .tab-content {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 0 0 8px 8px;
             border-top: none;
             padding: 16px;
@@ -225,8 +226,8 @@
         }
         
         .streaming-container {
-            background: rgba(255, 255, 255, 0.12);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.18);
+            border: 1px solid rgba(255, 255, 255, 0.25);
             border-radius: 8px;
             padding: 16px;
             margin: 12px 0;
@@ -234,7 +235,7 @@
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             line-height: 1.6;
             font-size: 14px;
-            color: var(--text-primary);
+            color: var(--text-readable);
             backdrop-filter: blur(15px);
             position: relative;
         }
@@ -338,8 +339,8 @@
             width: 100%;
             min-height: 100px;
             padding: 12px 14px;
-            background: rgba(255, 255, 255, 0.12);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             border-radius: 6px;
             color: var(--text-primary);
             font-size: 14px;
@@ -348,6 +349,10 @@
             font-family: inherit;
             transition: all 0.3s ease;
             backdrop-filter: blur(10px);
+        }
+        
+        textarea::placeholder {
+            color: var(--text-muted);
         }
         
         @media (max-width: 768px) {
@@ -362,8 +367,8 @@
         textarea:focus {
             outline: none;
             border-color: var(--primary-purple);
-            background: rgba(255, 255, 255, 0.16);
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+            background: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
         }
         
         textarea::placeholder {
@@ -429,14 +434,14 @@
         }
         
         .btn-secondary {
-            background: rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.15);
             color: var(--text-primary);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.25);
             backdrop-filter: blur(10px);
         }
         
         .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.18);
+            background: rgba(255, 255, 255, 0.22);
             transform: translateY(-1px);
         }
         
@@ -452,14 +457,20 @@
         }
         
         .result-section {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 8px;
             padding: 16px;
             margin-bottom: 20px;
             display: none;
             backdrop-filter: blur(15px);
             animation: fadeInUp 0.5s ease-out;
+        }
+        
+        .result-section h3 {
+            color: var(--text-primary);
+            font-weight: 600;
+            margin-bottom: 12px;
         }
         
         @keyframes fadeInUp {
@@ -486,7 +497,7 @@
         
         .result-title {
             font-weight: 600;
-            color: #fff;
+            color: var(--text-primary);
         }
         
         .score {
@@ -499,7 +510,7 @@
         
         .result-content {
             line-height: 1.6;
-            color: #ccc;
+            color: var(--text-readable);
         }
         
         .optimized-prompt {
@@ -512,13 +523,13 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             line-height: 1.7;
             font-size: 14px;
-            color: #e0e0e0;
+            color: var(--text-readable);
             word-wrap: break-word;
         }
         
         .explanation-section {
-            background: rgba(99, 102, 241, 0.1);
-            border: 1px solid rgba(99, 102, 241, 0.25);
+            background: rgba(99, 102, 241, 0.15);
+            border: 1px solid rgba(99, 102, 241, 0.3);
             border-radius: 8px;
             padding: 16px;
             margin-top: 12px;
@@ -526,9 +537,19 @@
             backdrop-filter: blur(15px);
         }
         
+        .explanation-section h3 {
+            color: var(--text-primary);
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        
+        .explanation-section p, .explanation-section ul, .explanation-section li {
+            color: var(--text-readable);
+        }
+        
         .section-title {
             font-weight: 600;
-            color: #fff;
+            color: var(--text-primary);
             margin-bottom: 8px;
             display: block;
             font-size: 15px;
@@ -567,15 +588,26 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(30, 30, 50, 0.95);
             backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             border-radius: 8px;
             padding: 32px;
             text-align: center;
             z-index: 1000;
             min-width: 240px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+        
+        .loading h3 {
+            color: var(--text-primary);
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .loading p {
+            color: var(--text-secondary);
+            font-size: 14px;
         }
         
         .loading.show {
@@ -673,19 +705,25 @@
         }
         
         .api-key-section {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.25);
             border-radius: 8px;
             padding: 16px;
             margin-bottom: 20px;
             backdrop-filter: blur(15px);
         }
         
+        .api-key-section h3 {
+            color: var(--text-primary);
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        
         .api-key-input {
             width: 100%;
             padding: 12px 16px;
-            background: rgba(255, 255, 255, 0.12);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             border-radius: 8px;
             color: var(--text-primary);
             font-size: 14px;
@@ -694,11 +732,15 @@
             backdrop-filter: blur(10px);
         }
         
+        .api-key-input::placeholder {
+            color: var(--text-muted);
+        }
+        
         .api-key-input:focus {
             outline: none;
             border-color: var(--primary-purple);
-            background: rgba(255, 255, 255, 0.16);
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+            background: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
         }
         
         .api-status {
@@ -780,7 +822,7 @@
                     
                     <div class="explanation-section" style="margin-top: 20px;">
                         <div class="section-title">What was improved:</div>
-                        <div id="streamingExplanation" class="streaming-text" style="color: #ccc;"></div>
+                        <div id="streamingExplanation" class="streaming-text"></div>
                         <span id="explanationCursor" class="typing-cursor" style="display: none;">|</span>
                     </div>
                     
@@ -830,10 +872,16 @@
         
         function formatMarkdown(text) {
             return text
-                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                .replace(/`(.*?)`/g, '<code style="background: #333; padding: 2px 4px; border-radius: 3px;">$1</code>')
-                .replace(/\n/g, '<br>');
+                .replace(/\*\*(.*?)\*\*/g, '<strong style="color: var(--text-primary); font-weight: 600;">$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em style="color: var(--text-secondary);">$1</em>')
+                .replace(/`(.*?)`/g, '<code style="background: rgba(255,255,255,0.2); color: var(--text-primary); padding: 2px 6px; border-radius: 4px; font-family: monospace;">$1</code>')
+                .replace(/^- (.+)$/gm, '<li style="color: var(--text-readable); margin: 4px 0;">$1</li>')
+                .replace(/^(\d+)\. (.+)$/gm, '<li style="color: var(--text-readable); margin: 4px 0;">$2</li>')
+                .replace(/(<li.*?<\/li>\s*)+/g, '<ul style="padding-left: 20px; margin: 8px 0;">$&</ul>')
+                .replace(/\n\n/g, '</p><p style="color: var(--text-readable); margin: 8px 0; line-height: 1.5;">')
+                .replace(/^(.+)$/gm, '<p style="color: var(--text-readable); margin: 4px 0; line-height: 1.5;">$1</p>')
+                .replace(/<p[^>]*><ul/g, '<ul')
+                .replace(/<\/ul><\/p>/g, '</ul>');
         }
         
         function streamFromAPI(prompt, apiKey) {
@@ -901,7 +949,7 @@
                 streamingPrompt.innerHTML += data.text;
             } else if (data.type === 'complete') {
                 // Parse and display the final structured response
-                document.getElementById('streamingPrompt').innerHTML = data.optimizedPrompt;
+                document.getElementById('streamingPrompt').innerHTML = `<div style="color: var(--text-readable); line-height: 1.6;">${formatMarkdown(data.optimizedPrompt)}</div>`;
                 document.getElementById('streamingExplanation').innerHTML = formatMarkdown(data.explanation);
                 document.getElementById('copyBtn').style.display = 'inline-block';
                 optimizedPrompt = data.optimizedPrompt;
