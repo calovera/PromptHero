@@ -504,15 +504,80 @@
                 .replace(/\n/g, '<br>');
         }
         
-        function displayInstantly(text, elementId, cursorId, onComplete) {
-            const element = document.getElementById(elementId);
-            const cursor = document.getElementById(cursorId);
-            
-            element.innerHTML = text;
-            cursor.style.display = 'none';
-            
-            if (onComplete) {
-                setTimeout(onComplete, 100); // Small delay for smooth transition
+        function streamFromAPI(prompt, apiKey) {
+            return new Promise((resolve, reject) => {
+                const eventSource = new EventSource('/api/optimize', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ prompt, apiKey })
+                });
+                
+                // For EventSource, we need to make a fetch request first
+                fetch('/api/optimize', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt, apiKey })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    
+                    const reader = response.body.getReader();
+                    const decoder = new TextDecoder();
+                    
+                    function readStream() {
+                        return reader.read().then(({ done, value }) => {
+                            if (done) {
+                                resolve();
+                                return;
+                            }
+                            
+                            const chunk = decoder.decode(value);
+                            const lines = chunk.split('\n');
+                            
+                            for (const line of lines) {
+                                if (line.startsWith('data: ')) {
+                                    try {
+                                        const data = JSON.parse(line.slice(6));
+                                        handleStreamChunk(data);
+                                    } catch (e) {
+                                        console.error('Error parsing stream data:', e);
+                                    }
+                                }
+                            }
+                            
+                            return readStream();
+                        });
+                    }
+                    
+                    return readStream();
+                })
+                .catch(error => {
+                    console.error('Stream error:', error);
+                    reject(error);
+                });
+            });
+        }
+        
+        function handleStreamChunk(data) {
+            if (data.type === 'chunk') {
+                // Append the new text chunk to the streaming prompt area
+                const streamingPrompt = document.getElementById('streamingPrompt');
+                streamingPrompt.innerHTML += data.text;
+            } else if (data.type === 'complete') {
+                // Parse and display the final structured response
+                document.getElementById('streamingPrompt').innerHTML = data.optimizedPrompt;
+                document.getElementById('streamingExplanation').innerHTML = formatMarkdown(data.explanation);
+                document.getElementById('copyBtn').style.display = 'inline-block';
+                optimizedPrompt = data.optimizedPrompt;
+                isStreaming = false;
+            } else if (data.type === 'error') {
+                showError(data.error);
+                document.getElementById('streamingAnimation').classList.remove('show');
+                isStreaming = false;
             }
         }
         
@@ -650,38 +715,17 @@
             isStreaming = true;
             
             try {
-                const response = await fetch('/api/optimize', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ prompt, apiKey: currentApiKey })
-                });
+                // Start real streaming from Gemini API
+                await streamFromAPI(prompt, currentApiKey);
                 
-                const result = await response.json();
+                // Hide streaming animation when complete
+                document.getElementById('streamingAnimation').classList.remove('show');
                 
-                if (result.success) {
-                    optimizedPrompt = result.optimizedPrompt;
-                    
-                    // Hide streaming animation
-                    document.getElementById('streamingAnimation').classList.remove('show');
-                    
-                    // Display the optimized prompt instantly
-                    displayInstantly(result.optimizedPrompt, 'streamingPrompt', 'promptCursor', () => {
-                        // Then display the explanation
-                        displayInstantly(formatMarkdown(result.explanation), 'streamingExplanation', 'explanationCursor', () => {
-                            // Show copy button when display is complete
-                            document.getElementById('copyBtn').style.display = 'inline-block';
-                            isStreaming = false;
-                        });
-                    });
-                } else {
-                    showError(result.error || 'Failed to optimize prompt');
-                }
             } catch (error) {
                 showError('Error optimizing prompt: ' + error.message);
+                document.getElementById('streamingAnimation').classList.remove('show');
+                isStreaming = false;
             }
-            
-            document.getElementById('streamingAnimation').classList.remove('show');
-            isStreaming = false;
         }
         
         function copyOptimized() {

@@ -109,66 +109,102 @@ Respond with JSON in this format:
     }
 });
 
-// Optimize prompt endpoint
+// Optimize prompt endpoint with real streaming
 app.post('/api/optimize', async (req, res) => {
+    const { prompt, apiKey } = req.body;
+    
+    if (!prompt || !apiKey) {
+        return res.status(400).json({ success: false, error: 'Prompt and API key are required' });
+    }
+    
+    // Set headers for Server-Sent Events
+    res.writeHead(200, {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type',
+    });
+    
     try {
-        const { prompt, apiKey } = req.body;
-        
-        if (!prompt || !apiKey) {
-            return res.json({ success: false, error: 'Prompt and API key are required' });
-        }
-        
         const ai = new GoogleGenAI({ apiKey });
         
-        const systemPrompt = `You are an expert prompt engineer. Take the given prompt and improve it significantly while maintaining the original intent.
+        const optimizePrompt = `Optimize this prompt to make it more effective, specific, and clear: "${prompt}"
 
-Provide:
-1. An optimized version that is more specific, clear, and effective
-2. A detailed explanation of what changes were made and why
+Provide your response in this format:
+IMPROVED PROMPT:
+[your improved version here]
 
-Focus on:
-- Adding specific details and context
-- Improving clarity and structure
-- Making the prompt more actionable
-- Providing examples when helpful
-- Specifying desired output format when appropriate
+EXPLANATION:
+[brief explanation of improvements]`;
 
-Respond with JSON in this format:
-{
-    "optimizedPrompt": "the improved version of the prompt",
-    "explanation": "detailed explanation of changes made and why they improve the prompt"
-}`;
+        // Use streaming generation
+        const streamingResult = await ai.models.generateContentStream({
+            model: 'gemini-2.5-flash',
+            contents: optimizePrompt
+        });
+
+        let fullResponse = '';
         
-        const response = await ai.models.generateContent({
-            model: "gemini-2.5-pro",
-            config: {
-                systemInstruction: systemPrompt,
-                responseMimeType: "application/json",
-                responseSchema: {
-                    type: "object",
-                    properties: {
-                        optimizedPrompt: { type: "string" },
-                        explanation: { type: "string" }
-                    },
-                    required: ["optimizedPrompt", "explanation"]
+        for await (const chunk of streamingResult) {
+            if (chunk.text) {
+                fullResponse += chunk.text;
+                // Send each chunk to the client immediately
+                res.write(`data: ${JSON.stringify({ 
+                    type: 'chunk', 
+                    text: chunk.text 
+                })}\n\n`);
+            }
+        }
+        
+        // Parse improved prompt and explanation
+        const sections = fullResponse.split(/IMPROVED PROMPT:|EXPLANATION:/i);
+        let improvedPrompt = '';
+        let explanation = '';
+        
+        if (sections.length >= 3) {
+            improvedPrompt = sections[1].trim();
+            explanation = sections[2].trim();
+        } else {
+            // Fallback parsing
+            const lines = fullResponse.split('\n');
+            const improvedIndex = lines.findIndex(line => 
+                line.toLowerCase().includes('improved') && line.toLowerCase().includes('prompt')
+            );
+            const explanationIndex = lines.findIndex(line => 
+                line.toLowerCase().includes('explanation')
+            );
+            
+            if (improvedIndex !== -1) {
+                if (explanationIndex !== -1) {
+                    improvedPrompt = lines.slice(improvedIndex + 1, explanationIndex).join('\n').trim();
+                    explanation = lines.slice(explanationIndex + 1).join('\n').trim();
+                } else {
+                    improvedPrompt = lines.slice(improvedIndex + 1).join('\n').trim();
+                    explanation = 'Prompt has been optimized for better clarity and effectiveness.';
                 }
-            },
-            contents: `Optimize this prompt: "${prompt}"`
-        });
+            } else {
+                improvedPrompt = fullResponse.split('\n')[0] || fullResponse;
+                explanation = 'Prompt has been optimized for better results.';
+            }
+        }
         
-        const result = JSON.parse(response.text);
-        res.json({
-            success: true,
-            optimizedPrompt: result.optimizedPrompt,
-            explanation: result.explanation
-        });
+        // Send final structured data
+        res.write(`data: ${JSON.stringify({ 
+            type: 'complete',
+            optimizedPrompt: improvedPrompt,
+            explanation: explanation
+        })}\n\n`);
+        
+        res.end();
         
     } catch (error) {
-        console.error('Optimize prompt error:', error);
-        res.json({ 
-            success: false, 
-            error: error.message || 'Failed to optimize prompt'
-        });
+        console.error('Optimize error:', error);
+        res.write(`data: ${JSON.stringify({ 
+            type: 'error',
+            error: 'Failed to optimize prompt: ' + error.message 
+        })}\n\n`);
+        res.end();
     }
 });
 
