@@ -64,7 +64,7 @@
             background: rgba(255, 255, 255, 0.12);
             backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.18);
-            border-radius: 20px;
+            border-radius: 16px;
             padding: 28px;
             width: 100%;
             max-width: 700px;
@@ -94,9 +94,10 @@
         .tab-buttons {
             display: flex;
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
+            border-radius: 12px 12px 0 0;
             padding: 4px;
             border: 1px solid rgba(255, 255, 255, 0.15);
+            border-bottom: none;
             position: relative;
             backdrop-filter: blur(10px);
         }
@@ -111,7 +112,7 @@
             font-size: 14px;
             font-weight: 600;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            border-radius: 8px;
+            border-radius: 8px 8px 0 0;
             position: relative;
             z-index: 2;
             display: flex;
@@ -128,7 +129,7 @@
             right: 0;
             bottom: 0;
             background: linear-gradient(135deg, var(--primary-purple), var(--purple-light));
-            border-radius: 8px;
+            border-radius: 8px 8px 0 0;
             opacity: 0;
             transition: opacity 0.3s ease;
             z-index: -1;
@@ -155,6 +156,7 @@
             background: rgba(255, 255, 255, 0.08);
             border: 1px solid rgba(255, 255, 255, 0.15);
             border-radius: 0 0 12px 12px;
+            border-top: none;
             padding: 20px;
             min-height: 380px;
             backdrop-filter: blur(10px);
@@ -171,7 +173,7 @@
         .streaming-container {
             background: rgba(255, 255, 255, 0.12);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 12px;
+            border-radius: 8px;
             padding: 16px;
             margin: 12px 0;
             min-height: 160px;
@@ -271,7 +273,7 @@
             padding: 14px 16px;
             background: rgba(255, 255, 255, 0.12);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 12px;
+            border-radius: 8px;
             color: var(--text-primary);
             font-size: 14px;
             line-height: 1.5;
@@ -302,7 +304,7 @@
             flex: 1;
             padding: 12px 20px;
             border: none;
-            border-radius: 12px;
+            border-radius: 8px;
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
@@ -367,7 +369,7 @@
         .result-section {
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 12px;
+            border-radius: 8px;
             padding: 16px;
             margin-bottom: 20px;
             display: none;
@@ -432,7 +434,7 @@
         .explanation-section {
             background: rgba(99, 102, 241, 0.1);
             border: 1px solid rgba(99, 102, 241, 0.25);
-            border-radius: 12px;
+            border-radius: 8px;
             padding: 16px;
             margin-top: 12px;
             line-height: 1.5;
@@ -452,7 +454,7 @@
             color: var(--text-primary);
             border: 1px solid rgba(255, 255, 255, 0.2);
             padding: 10px 16px;
-            border-radius: 10px;
+            border-radius: 8px;
             font-size: 13px;
             font-weight: 500;
             cursor: pointer;
@@ -483,7 +485,7 @@
             background: rgba(255, 255, 255, 0.15);
             backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 16px;
+            border-radius: 8px;
             padding: 32px;
             text-align: center;
             z-index: 1000;
@@ -554,7 +556,7 @@
             border: 1px solid rgba(239, 68, 68, 0.3);
             color: #fca5a5;
             padding: 16px 20px;
-            border-radius: 12px;
+            border-radius: 8px;
             margin-bottom: 20px;
             backdrop-filter: blur(10px);
             display: flex;
@@ -572,7 +574,7 @@
             border: 1px solid rgba(16, 185, 129, 0.3);
             color: #6ee7b7;
             padding: 16px 20px;
-            border-radius: 12px;
+            border-radius: 8px;
             margin-bottom: 20px;
             backdrop-filter: blur(10px);
             display: flex;
@@ -588,7 +590,7 @@
         .api-key-section {
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 12px;
+            border-radius: 8px;
             padding: 16px;
             margin-bottom: 20px;
             backdrop-filter: blur(15px);
@@ -599,7 +601,7 @@
             padding: 12px 16px;
             background: rgba(255, 255, 255, 0.12);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
+            border-radius: 8px;
             color: var(--text-primary);
             font-size: 14px;
             margin-bottom: 10px;
