@@ -7,6 +7,15 @@ const PORT = 5000;
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
+app.use('/dist', express.static(path.join(__dirname, '..', 'dist')));
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'test.html'));
+});
+
+app.get('/demo', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
 
 // Test API key endpoint
 app.post('/api/test-key', async (req, res) => {
