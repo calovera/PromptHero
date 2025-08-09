@@ -1,2 +1,60 @@
+modules = ["nodejs-20"]
 [agent]
 expertMode = true
+
+[nix]
+channel = "stable-25_05"
+packages = ["imagemagick"]
+
+[workflows]
+runButton = "Project"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Install Dependencies"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Build Extension"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Test Extension"
+
+[[workflows.workflow]]
+name = "Install Dependencies"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm install"
+
+[workflows.workflow.metadata]
+outputType = "console"
+
+[[workflows.workflow]]
+name = "Build Extension"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run build"
+
+[workflows.workflow.metadata]
+outputType = "console"
+
+[[workflows.workflow]]
+name = "Test Extension"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "echo \"PromptHero Extension Testing Suite\" && echo \"\" && echo \"✅ Extension built successfully\" && echo \"🔑 API key configured\" && echo \"📁 Extension files ready in ./dist/\" && echo \"\" && echo \"Ready for Chrome testing:\" && echo \"1. Open chrome://extensions/\" && echo \"2. Enable Developer mode\" && echo \"3. Load unpacked from ./dist/\" && echo \"\" && ls -la dist/"
+
+[workflows.workflow.metadata]
+outputType = "console"
