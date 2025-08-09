@@ -153,8 +153,39 @@
         }
         
         .result-content {
-            line-height: 1.5;
+            line-height: 1.6;
             color: #ccc;
+        }
+        
+        .optimized-prompt {
+            background: #1e1e1e;
+            border: 2px solid #444;
+            border-radius: 8px;
+            padding: 16px;
+            margin: 12px 0;
+            white-space: pre-wrap;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.7;
+            font-size: 14px;
+            color: #e0e0e0;
+            word-wrap: break-word;
+        }
+        
+        .explanation-section {
+            background: #1a1a2e;
+            border: 1px solid #16213e;
+            border-radius: 6px;
+            padding: 14px;
+            margin-top: 12px;
+            line-height: 1.6;
+        }
+        
+        .section-title {
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 8px;
+            display: block;
+            font-size: 15px;
         }
         
         .copy-btn {
@@ -441,7 +472,10 @@
                 
                 if (result.success) {
                     document.getElementById('scoreValue').textContent = result.score + '/10';
-                    document.getElementById('scoreContent').textContent = result.feedback;
+                    
+                    // Format the feedback with better structure
+                    const formattedFeedback = result.feedback.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                    document.getElementById('scoreContent').innerHTML = formattedFeedback;
                     document.getElementById('scoreResult').classList.add('show');
                 } else {
                     showError(result.error || 'Failed to score prompt');
@@ -478,11 +512,19 @@
                 
                 if (result.success) {
                     optimizedPrompt = result.optimizedPrompt;
-                    document.getElementById('optimizeContent').innerHTML = 
-                        '<strong>Improved Prompt:</strong><br>' + 
-                        result.optimizedPrompt + 
-                        '<br><br><strong>Explanation:</strong><br>' + 
-                        result.explanation;
+                    
+                    // Format the optimized prompt with proper structure
+                    const formattedContent = `
+                        <div class="section-title">Improved Prompt:</div>
+                        <div class="optimized-prompt">${result.optimizedPrompt}</div>
+                        
+                        <div class="explanation-section">
+                            <div class="section-title">What was improved:</div>
+                            <div style="color: #ccc;">${result.explanation}</div>
+                        </div>
+                    `;
+                    
+                    document.getElementById('optimizeContent').innerHTML = formattedContent;
                     document.getElementById('optimizeResult').classList.add('show');
                 } else {
                     showError(result.error || 'Failed to optimize prompt');
