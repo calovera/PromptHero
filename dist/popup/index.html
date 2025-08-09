@@ -4,12 +4,30 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PromptHero</title>
+  <link rel="stylesheet" href="https://unpkg.com/@radix-ui/themes@3/styles.css">
   <style>
     body {
       width: 400px;
       height: 600px;
       margin: 0;
       padding: 0;
+      background: #111111;
+      color: white;
+    }
+    
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+    
+    #root {
+      height: 100%;
+      width: 100%;
     }
   </style>
 </head>
