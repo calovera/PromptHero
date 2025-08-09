@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PromptHero - Web Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: #111111;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 24px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .header p {
+            color: #888;
+            font-size: 14px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #ccc;
+        }
+        
+        textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 12px;
+            background: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 14px;
+            resize: vertical;
+            font-family: inherit;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: #0066cc;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: #0066cc;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #0052a3;
+        }
+        
+        .btn-secondary {
+            background: #333;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #444;
+        }
+        
+        .btn-primary:disabled,
+        .btn-secondary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .result-section {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 6px;
+            padding: 16px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .result-section.show {
+            display: block;
+        }
+        
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .result-title {
+            font-weight: 600;
+            color: #fff;
+        }
+        
+        .score {
+            background: #0066cc;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+        
+        .result-content {
+            line-height: 1.5;
+            color: #ccc;
+        }
+        
+        .copy-btn {
+            background: #333;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+        
+        .copy-btn:hover {
+            background: #444;
+        }
+        
+        .loading {
+            text-align: center;
+            color: #888;
+            padding: 20px;
+        }
+        
+        .error {
+            background: #2d1b1b;
+            border: 1px solid #cc0000;
+            color: #ff6666;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+        }
+        
+        .success {
+            background: #1b2d1b;
+            border: 1px solid #00cc00;
+            color: #66ff66;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+        }
+        
+        .api-key-section {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 6px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .api-key-input {
+            width: 100%;
+            padding: 8px 12px;
+            background: #111;
+            border: 1px solid #444;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        
+        .api-key-input:focus {
+            outline: none;
+            border-color: #0066cc;
+        }
+        
+        .api-status {
+            font-size: 12px;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>PromptHero</h1>
+            <p>AI Prompt Optimizer - Web Demo</p>
+        </div>
+        
+        <div class="api-key-section">
+            <label for="apiKey">Gemini API Key:</label>
+            <input type="password" id="apiKey" class="api-key-input" placeholder="Enter your Gemini API key">
+            <button onclick="testApiKey()" class="btn-secondary" style="width: 100%; margin-top: 8px;">Test API Key</button>
+            <div id="apiStatus" class="api-status"></div>
+        </div>
+        
+        <div id="errorMessage" class="error" style="display: none;"></div>
+        <div id="successMessage" class="success" style="display: none;"></div>
+        
+        <div class="form-group">
+            <label for="prompt">Enter your AI prompt:</label>
+            <textarea id="prompt" placeholder="Example: Write a story about a robot..."></textarea>
+        </div>
+        
+        <div class="button-group">
+            <button onclick="scorePrompt()" class="btn-primary" id="scoreBtn">Score Prompt</button>
+            <button onclick="optimizePrompt()" class="btn-secondary" id="optimizeBtn">Optimize Prompt</button>
+        </div>
+        
+        <div id="scoreResult" class="result-section">
+            <div class="result-header">
+                <span class="result-title">Prompt Score</span>
+                <span id="scoreValue" class="score">-/10</span>
+            </div>
+            <div id="scoreContent" class="result-content"></div>
+        </div>
+        
+        <div id="optimizeResult" class="result-section">
+            <div class="result-header">
+                <span class="result-title">Optimized Prompt</span>
+            </div>
+            <div id="optimizeContent" class="result-content"></div>
+            <button onclick="copyOptimized()" class="copy-btn">Copy to Clipboard</button>
+        </div>
+        
+        <div id="loading" class="loading" style="display: none;">
+            <p>Processing with Gemini AI...</p>
+        </div>
+    </div>
+
+    <script>
+        let currentApiKey = '';
+        let optimizedPrompt = '';
+        
+        // Check for API key in localStorage
+        window.onload = function() {
+            const savedKey = localStorage.getItem('geminiApiKey');
+            if (savedKey) {
+                document.getElementById('apiKey').value = savedKey;
+                currentApiKey = savedKey;
+                showSuccess('API key loaded from previous session');
+            }
+        };
+        
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            setTimeout(() => errorDiv.style.display = 'none', 5000);
+        }
+        
+        function showSuccess(message) {
+            const successDiv = document.getElementById('successMessage');
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+            setTimeout(() => successDiv.style.display = 'none', 3000);
+        }
+        
+        function showLoading(show) {
+            document.getElementById('loading').style.display = show ? 'block' : 'none';
+            document.getElementById('scoreBtn').disabled = show;
+            document.getElementById('optimizeBtn').disabled = show;
+        }
+        
+        async function testApiKey() {
+            const apiKey = document.getElementById('apiKey').value.trim();
+            if (!apiKey) {
+                showError('Please enter an API key');
+                return;
+            }
+            
+            showLoading(true);
+            
+            try {
+                const response = await fetch('/api/test-key', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ apiKey })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    currentApiKey = apiKey;
+                    localStorage.setItem('geminiApiKey', apiKey);
+                    showSuccess('API key is valid and working!');
+                    document.getElementById('apiStatus').innerHTML = '<span style="color: #66ff66;">✓ API key verified</span>';
+                } else {
+                    showError(result.error || 'API key test failed');
+                    document.getElementById('apiStatus').innerHTML = '<span style="color: #ff6666;">✗ API key invalid</span>';
+                }
+            } catch (error) {
+                showError('Error testing API key: ' + error.message);
+            }
+            
+            showLoading(false);
+        }
+        
+        async function scorePrompt() {
+            const prompt = document.getElementById('prompt').value.trim();
+            if (!prompt) {
+                showError('Please enter a prompt to score');
+                return;
+            }
+            
+            if (!currentApiKey) {
+                showError('Please set and test your API key first');
+                return;
+            }
+            
+            showLoading(true);
+            
+            try {
+                const response = await fetch('/api/score', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt, apiKey: currentApiKey })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    document.getElementById('scoreValue').textContent = result.score + '/10';
+                    document.getElementById('scoreContent').textContent = result.feedback;
+                    document.getElementById('scoreResult').classList.add('show');
+                } else {
+                    showError(result.error || 'Failed to score prompt');
+                }
+            } catch (error) {
+                showError('Error scoring prompt: ' + error.message);
+            }
+            
+            showLoading(false);
+        }
+        
+        async function optimizePrompt() {
+            const prompt = document.getElementById('prompt').value.trim();
+            if (!prompt) {
+                showError('Please enter a prompt to optimize');
+                return;
+            }
+            
+            if (!currentApiKey) {
+                showError('Please set and test your API key first');
+                return;
+            }
+            
+            showLoading(true);
+            
+            try {
+                const response = await fetch('/api/optimize', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt, apiKey: currentApiKey })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    optimizedPrompt = result.optimizedPrompt;
+                    document.getElementById('optimizeContent').innerHTML = 
+                        '<strong>Improved Prompt:</strong><br>' + 
+                        result.optimizedPrompt + 
+                        '<br><br><strong>Explanation:</strong><br>' + 
+                        result.explanation;
+                    document.getElementById('optimizeResult').classList.add('show');
+                } else {
+                    showError(result.error || 'Failed to optimize prompt');
+                }
+            } catch (error) {
+                showError('Error optimizing prompt: ' + error.message);
+            }
+            
+            showLoading(false);
+        }
+        
+        function copyOptimized() {
+            if (optimizedPrompt) {
+                navigator.clipboard.writeText(optimizedPrompt).then(() => {
+                    showSuccess('Optimized prompt copied to clipboard!');
+                });
+            }
+        }
+    </script>
+</body>
+</html>

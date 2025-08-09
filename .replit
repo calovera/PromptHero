@@ -26,6 +26,10 @@ args = "Build Extension"
 task = "workflow.run"
 args = "Test Extension"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Web Demo Server"
+
 [[workflows.workflow]]
 name = "Install Dependencies"
 author = "agent"
@@ -58,3 +62,19 @@ args = "echo \"PromptHero Extension Testing Suite\" && echo \"\" && echo \"✅ E
 
 [workflows.workflow.metadata]
 outputType = "console"
+
+[[workflows.workflow]]
+name = "Web Demo Server"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd web-demo && node server.js"
+waitForPort = 5000
+
+[workflows.workflow.metadata]
+outputType = "webview"
+
+[[ports]]
+localPort = 5000
+externalPort = 80
