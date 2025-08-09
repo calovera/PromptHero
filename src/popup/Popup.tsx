@@ -209,7 +209,17 @@ const Popup: React.FC = () => {
       radius="medium"
       scaling="95%"
     >
-      <div style={{ width: '400px', height: '600px', padding: '16px', overflow: 'auto' }}>
+      <style>{`
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        @keyframes pulse {
+          0%, 100% { transform: scale(1); }
+          50% { transform: scale(1.1); }
+        }
+      `}</style>
+      <div style={{ width: '400px', height: '600px', padding: '16px', overflow: 'auto', position: 'relative' }}>
         {toast && (
           <Toast 
             message={toast.message} 
@@ -247,72 +257,13 @@ const Popup: React.FC = () => {
           )}
 
           {/* Prompt Editor */}
-          {!isLoading && (
-            <PromptEditor
-              value={prompt}
-              onChange={setPrompt}
-              onClear={handleClear}
-              onPresetSelect={handlePresetSelect}
-              disabled={isLoading}
-            />
-          )}
-
-          {/* Loading Animation - Full Screen Overlay */}
-          {isScoring && (
-            <div style={{
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              background: 'rgba(0, 0, 0, 0.8)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              zIndex: 1000
-            }}>
-              <div style={{
-                background: 'var(--gray-1)',
-                borderRadius: '12px',
-                padding: '24px',
-                textAlign: 'center',
-                border: '1px solid var(--gray-6)'
-              }}>
-                <LoadingAnimation message="Analyzing your prompt..." size={120} type="scoring" />
-                <Text size="2" style={{ color: 'var(--gray-11)', marginTop: '12px', display: 'block' }}>
-                  This might take a few seconds
-                </Text>
-              </div>
-            </div>
-          )}
-          
-          {isOptimizing && (
-            <div style={{
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              background: 'rgba(0, 0, 0, 0.8)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              zIndex: 1000
-            }}>
-              <div style={{
-                background: 'var(--gray-1)',
-                borderRadius: '12px',
-                padding: '24px',
-                textAlign: 'center',
-                border: '1px solid var(--gray-6)'
-              }}>
-                <LoadingAnimation message="Creating your improved prompt..." size={120} type="optimizing" />
-                <Text size="2" style={{ color: 'var(--gray-11)', marginTop: '12px', display: 'block' }}>
-                  This might take a few seconds
-                </Text>
-              </div>
-            </div>
-          )}
+          <PromptEditor
+            value={prompt}
+            onChange={setPrompt}
+            onClear={handleClear}
+            onPresetSelect={handlePresetSelect}
+            disabled={isLoading}
+          />
 
           {/* Toolbar */}
           <Toolbar
@@ -331,6 +282,90 @@ const Popup: React.FC = () => {
               optimizing: isOptimizing
             }}
           />
+
+          {/* Loading Animation - Center Overlay */}
+          {(isScoring || isOptimizing) && (
+            <div style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              background: 'var(--gray-1)',
+              borderRadius: '16px',
+              padding: '32px',
+              textAlign: 'center',
+              border: '2px solid var(--blue-6)',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+              zIndex: 1000,
+              minWidth: '200px'
+            }}>
+              {isScoring && (
+                <>
+                  <div style={{ 
+                    width: '80px', 
+                    height: '80px', 
+                    margin: '0 auto 16px',
+                    background: 'linear-gradient(45deg, #3b82f6, #1d4ed8)',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    animation: 'spin 2s linear infinite'
+                  }}>
+                    <div style={{
+                      width: '50px',
+                      height: '50px',
+                      background: 'var(--gray-1)',
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}>
+                      <Text size="4" weight="bold" style={{ color: 'var(--blue-11)' }}>📊</Text>
+                    </div>
+                  </div>
+                  <Text size="3" weight="medium" style={{ color: 'var(--gray-12)', marginBottom: '8px', display: 'block' }}>
+                    Analyzing your prompt...
+                  </Text>
+                </>
+              )}
+              
+              {isOptimizing && (
+                <>
+                  <div style={{ 
+                    width: '80px', 
+                    height: '80px', 
+                    margin: '0 auto 16px',
+                    background: 'linear-gradient(45deg, #10b981, #059669)',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    animation: 'pulse 1.5s ease-in-out infinite'
+                  }}>
+                    <div style={{
+                      width: '50px',
+                      height: '50px',
+                      background: 'var(--gray-1)',
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}>
+                      <Text size="4" weight="bold" style={{ color: 'var(--green-11)' }}>⚡</Text>
+                    </div>
+                  </div>
+                  <Text size="3" weight="medium" style={{ color: 'var(--gray-12)', marginBottom: '8px', display: 'block' }}>
+                    Creating your improved prompt...
+                  </Text>
+                </>
+              )}
+              
+              <Text size="2" style={{ color: 'var(--gray-11)' }}>
+                This might take a few seconds
+              </Text>
+            </div>
+          )}
 
           {/* Score Panels */}
           <ScorePanel title="Current score" score={originalScore} />

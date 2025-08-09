@@ -36,22 +36,32 @@ const ImprovedPanel: React.FC<ImprovedPanelProps> = ({ improved, checklist, onCo
       </Flex>
       
       <div style={{ 
-        background: 'var(--gray-3)', 
-        border: '1px solid var(--gray-6)',
-        borderRadius: '8px', 
-        padding: '16px',
+        background: 'var(--gray-2)', 
+        border: '2px solid var(--gray-6)',
+        borderRadius: '12px', 
+        padding: '20px',
         marginBottom: checklist ? '16px' : '0',
-        maxHeight: '200px',
-        overflowY: 'auto'
+        maxHeight: '250px',
+        overflowY: 'auto',
+        fontSize: '14px',
+        fontFamily: 'ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif'
       }}>
-        <Text size="2" style={{ 
-          lineHeight: '1.6',
-          display: 'block',
+        <div style={{
+          lineHeight: '1.8',
+          color: 'var(--gray-12)',
           whiteSpace: 'pre-wrap',
-          wordWrap: 'break-word'
+          wordBreak: 'break-word'
         }}>
-          {improved}
-        </Text>
+          {improved.split('\n').map((paragraph, idx) => (
+            <p key={idx} style={{ 
+              margin: paragraph.trim() ? '0 0 12px 0' : '0',
+              fontSize: '14px',
+              fontWeight: '400'
+            }}>
+              {paragraph}
+            </p>
+          ))}
+        </div>
       </div>
       
       {checklist && checklist.length > 0 && (
