@@ -1,97 +1,83 @@
-// TypeScript definitions for messages passed between popup, options, and background pages
+import { Score, Optimize } from './schema'
 
-export type BgRequest =
-  | { type: 'SCORE_PROMPT'; prompt: string }
-  | { type: 'OPTIMIZE_PROMPT'; prompt: string }
-  | { type: 'TEST_API_KEY'; apiKey: string }
-  | { type: 'GET_HISTORY' }
-  | { type: 'CLEAR_HISTORY' }
-  | { type: 'SAVE_TO_HISTORY'; item: HistoryItemData };
-
-export type BgResponse<T = unknown> =
-  | { ok: true; data: T }
-  | { ok: false; error: string };
-
-// Specific response types for different requests
-export interface ScoreResponse {
-  score: number;
-  feedback: string;
-  suggestions: string[];
+// Message types for communication between popup/options and background
+export interface ScoreMessage {
+  type: 'SCORE_PROMPT'
+  prompt: string
 }
 
-export interface OptimizeResponse {
-  improvedPrompt: string;
-  changes: string[];
-  reasoning: string;
+export interface OptimizeMessage {
+  type: 'OPTIMIZE_PROMPT'
+  prompt: string
 }
 
-export interface TestApiKeyResponse {
-  isValid: boolean;
+export interface TestKeyMessage {
+  type: 'TEST_API_KEY'
 }
 
-export interface HistoryItemData {
-  id?: string;
-  originalPrompt: string;
-  improvedPrompt?: string;
-  score?: number;
-  timestamp?: Date;
-  type: 'score' | 'optimize' | 'manual';
+export type BackgroundMessage = ScoreMessage | OptimizeMessage | TestKeyMessage
+
+// Response types
+export interface SuccessResponse<T> {
+  ok: true
+  data: T
 }
 
-export interface GetHistoryResponse {
-  history: HistoryItemData[];
+export interface ErrorResponse {
+  ok: false
+  error: string
 }
 
-// Type guards for runtime type checking
-export const isBgRequest = (data: unknown): data is BgRequest => {
-  if (typeof data !== 'object' || data === null) return false;
-  const req = data as any;
-  return typeof req.type === 'string' && ['SCORE_PROMPT', 'OPTIMIZE_PROMPT', 'TEST_API_KEY', 'GET_HISTORY', 'CLEAR_HISTORY', 'SAVE_TO_HISTORY'].includes(req.type);
-};
+export type BackgroundResponse<T> = SuccessResponse<T> | ErrorResponse
 
-export const isBgResponse = (data: unknown): data is BgResponse => {
-  if (typeof data !== 'object' || data === null) return false;
-  const res = data as any;
-  return typeof res.ok === 'boolean' && (res.ok === true ? 'data' in res : 'error' in res && typeof res.error === 'string');
-};
-
-// Helper function to send messages to background script
-export const sendToBackground = async <T>(request: BgRequest): Promise<BgResponse<T>> => {
-  return new Promise((resolve) => {
-    chrome.runtime.sendMessage(request, (response: BgResponse<T>) => {
-      if (chrome.runtime.lastError) {
-        resolve({
-          ok: false,
-          error: chrome.runtime.lastError.message || 'Unknown error occurred'
-        });
-      } else {
-        resolve(response);
+// Helper functions for popup
+export async function scorePromptViaBg(text: string): Promise<Score> {
+  return new Promise((resolve, reject) => {
+    chrome.runtime.sendMessage(
+      { type: 'SCORE_PROMPT', prompt: text } as ScoreMessage,
+      (response: BackgroundResponse<Score>) => {
+        if (chrome.runtime.lastError) {
+          reject(new Error(chrome.runtime.lastError.message))
+        } else if (response.ok) {
+          resolve(response.data)
+        } else {
+          reject(new Error(response.error))
+        }
       }
-    });
-  });
-};
+    )
+  })
+}
 
-// Specific helper functions for common operations
-export const scorePrompt = async (prompt: string): Promise<BgResponse<ScoreResponse>> => {
-  return sendToBackground<ScoreResponse>({ type: 'SCORE_PROMPT', prompt });
-};
+export async function optimizePromptViaBg(text: string): Promise<Optimize> {
+  return new Promise((resolve, reject) => {
+    chrome.runtime.sendMessage(
+      { type: 'OPTIMIZE_PROMPT', prompt: text } as OptimizeMessage,
+      (response: BackgroundResponse<Optimize>) => {
+        if (chrome.runtime.lastError) {
+          reject(new Error(chrome.runtime.lastError.message))
+        } else if (response.ok) {
+          resolve(response.data)
+        } else {
+          reject(new Error(response.error))
+        }
+      }
+    )
+  })
+}
 
-export const optimizePrompt = async (prompt: string): Promise<BgResponse<OptimizeResponse>> => {
-  return sendToBackground<OptimizeResponse>({ type: 'OPTIMIZE_PROMPT', prompt });
-};
-
-export const testApiKey = async (apiKey: string): Promise<BgResponse<TestApiKeyResponse>> => {
-  return sendToBackground<TestApiKeyResponse>({ type: 'TEST_API_KEY', apiKey });
-};
-
-export const getHistory = async (): Promise<BgResponse<GetHistoryResponse>> => {
-  return sendToBackground<GetHistoryResponse>({ type: 'GET_HISTORY' });
-};
-
-export const clearHistory = async (): Promise<BgResponse<void>> => {
-  return sendToBackground<void>({ type: 'CLEAR_HISTORY' });
-};
-
-export const saveToHistory = async (item: HistoryItemData): Promise<BgResponse<void>> => {
-  return sendToBackground<void>({ type: 'SAVE_TO_HISTORY', item });
-};
+export async function testApiKeyViaBg(): Promise<{ ok: boolean }> {
+  return new Promise((resolve, reject) => {
+    chrome.runtime.sendMessage(
+      { type: 'TEST_API_KEY' } as TestKeyMessage,
+      (response: BackgroundResponse<{ ok: boolean }>) => {
+        if (chrome.runtime.lastError) {
+          reject(new Error(chrome.runtime.lastError.message))
+        } else if (response.ok) {
+          resolve(response.data)
+        } else {
+          reject(new Error(response.error))
+        }
+      }
+    )
+  })
+}

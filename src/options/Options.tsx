@@ -1,205 +1,212 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Container, 
-  Card, 
-  Heading, 
-  Text, 
-  TextField, 
-  Button, 
-  Flex, 
-  Box,
-  Separator,
-  Callout
-} from '@radix-ui/themes';
+import { Theme, Button, Card, Text, TextField, Flex } from '@radix-ui/themes';
+import '@radix-ui/themes/styles.css';
+import { setKey, getKey } from '../lib/storage';
+import { testApiKeyViaBg } from '../lib/messages';
+
+interface ToastProps {
+  type: 'success' | 'error';
+  message: string;
+  onClose: () => void;
+}
+
+const Toast: React.FC<ToastProps> = ({ type, message, onClose }) => {
+  useEffect(() => {
+    const timer = setTimeout(onClose, 3000);
+    return () => clearTimeout(timer);
+  }, [onClose]);
+
+  return (
+    <div
+      style={{
+        position: 'fixed',
+        top: '20px',
+        right: '20px',
+        padding: '12px 20px',
+        borderRadius: '6px',
+        background: type === 'success' ? '#0d9488' : '#dc2626',
+        color: 'white',
+        zIndex: 1000,
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+      }}
+    >
+      {message}
+    </div>
+  );
+};
 
 const Options: React.FC = () => {
   const [apiKey, setApiKey] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   useEffect(() => {
-    // Load existing API key on component mount
+    // Load saved API key on component mount
     loadApiKey();
   }, []);
 
   const loadApiKey = async () => {
     try {
-      const result = await chrome.storage.sync.get(['geminiApiKey']);
-      if (result.geminiApiKey) {
-        setApiKey(result.geminiApiKey);
+      const key = await getKey();
+      if (key) {
+        setApiKey(key);
       }
     } catch (error) {
       console.error('Failed to load API key:', error);
     }
   };
 
-  const handleSave = async () => {
-    setIsLoading(true);
-    setMessage(null);
-
-    try {
-      await chrome.storage.sync.set({ geminiApiKey: apiKey.trim() });
-      setMessage({ type: 'success', text: 'API key saved successfully!' });
-    } catch (error) {
-      console.error('Failed to save API key:', error);
-      setMessage({ type: 'error', text: 'Failed to save API key. Please try again.' });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleTest = async () => {
+  const saveApiKey = async () => {
     if (!apiKey.trim()) {
-      setMessage({ type: 'error', text: 'Please enter an API key first.' });
+      showToast('error', 'Please enter an API key');
       return;
     }
 
     setIsLoading(true);
-    setMessage(null);
-
     try {
-      const response = await chrome.runtime.sendMessage({
-        type: 'TEST_API_KEY',
-        apiKey: apiKey.trim()
-      });
-      
-      if (response.ok && response.data.isValid) {
-        setMessage({ type: 'success', text: 'API key is valid and working!' });
-      } else {
-        setMessage({ type: 'error', text: 'API key is invalid. Please check your key and try again.' });
-      }
+      await setKey(apiKey.trim());
+      showToast('success', 'API key saved successfully');
     } catch (error) {
-      console.error('Failed to test API key:', error);
-      setMessage({ type: 'error', text: 'Failed to test API key. Please check your connection.' });
+      console.error('Failed to save API key:', error);
+      showToast('error', 'Failed to save API key');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleClear = async () => {
+  const testApiKey = async () => {
+    if (!apiKey.trim()) {
+      showToast('error', 'Please enter an API key first');
+      return;
+    }
+
+    setIsLoading(true);
     try {
-      await chrome.storage.sync.remove(['geminiApiKey']);
-      setApiKey('');
-      setMessage({ type: 'success', text: 'API key cleared successfully!' });
+      // Save the key first so the background can access it
+      await setKey(apiKey.trim());
+      
+      const result = await testApiKeyViaBg();
+      
+      if (result.ok) {
+        showToast('success', 'Key works');
+      } else {
+        showToast('error', 'API key test failed');
+      }
     } catch (error) {
-      console.error('Failed to clear API key:', error);
-      setMessage({ type: 'error', text: 'Failed to clear API key. Please try again.' });
+      console.error('Failed to test API key:', error);
+      showToast('error', `Test failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  return (
-    <Container size="2" p="6">
-      <Box mb="6">
-        <Heading size="6" mb="2">PromptHero Settings</Heading>
-        <Text color="gray">
-          Configure your API settings and preferences
-        </Text>
-      </Box>
+  const showToast = (type: 'success' | 'error', message: string) => {
+    setToast({ type, message });
+  };
 
-      <Flex direction="column" gap="6">
-        {/* API Configuration */}
-        <Card>
+  const closeToast = () => {
+    setToast(null);
+  };
+
+  return (
+    <Theme
+      appearance="dark"
+      accentColor="blue"
+      grayColor="slate"
+      radius="medium"
+      scaling="100%"
+    >
+      <div style={{ padding: '24px', maxWidth: '600px', margin: '0 auto' }}>
+        {toast && (
+          <Toast 
+            type={toast.type} 
+            message={toast.message} 
+            onClose={closeToast} 
+          />
+        )}
+
+        <Card style={{ padding: '24px' }}>
           <Flex direction="column" gap="4">
-            <Heading size="4">Gemini API Configuration</Heading>
-            
-            <Box>
-              <Text size="2" weight="medium" mb="2" style={{ display: 'block' }}>
-                API Key
+            <div>
+              <Text size="6" weight="bold">PromptHero Options</Text>
+              <Text size="2" style={{ color: 'var(--gray-11)', marginTop: '4px', display: 'block' }}>
+                Configure your Gemini API key to start optimizing prompts
+              </Text>
+            </div>
+
+            <div>
+              <Text size="3" weight="medium" style={{ marginBottom: '8px', display: 'block' }}>
+                Gemini API Key
               </Text>
               <TextField.Root
                 value={apiKey}
                 onChange={(e) => setApiKey(e.target.value)}
-                placeholder="Enter your Gemini API key..."
-                type="password"
+                placeholder="Enter your Gemini API key (starts with AIza...)"
                 size="3"
+                style={{ width: '100%' }}
+                type="password"
               />
-              <Text size="1" color="gray" mt="1" style={{ display: 'block' }}>
-                Your API key is stored locally and never shared with third parties.
+              <Text size="1" style={{ color: 'var(--gray-11)', marginTop: '4px', display: 'block' }}>
+                Get your free API key from{' '}
+                <a 
+                  href="https://aistudio.google.com/app/apikey" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  style={{ color: 'var(--accent-11)' }}
+                >
+                  Google AI Studio
+                </a>
               </Text>
-            </Box>
+            </div>
 
-            <Flex gap="2">
+            <Flex gap="3" style={{ marginTop: '16px' }}>
               <Button 
-                onClick={handleSave} 
+                onClick={saveApiKey}
                 disabled={isLoading || !apiKey.trim()}
-                style={{ flex: 1 }}
+                size="3"
+                variant="solid"
               >
                 {isLoading ? 'Saving...' : 'Save'}
               </Button>
+              
               <Button 
-                variant="outline" 
-                onClick={handleTest}
+                onClick={testApiKey}
                 disabled={isLoading || !apiKey.trim()}
-                style={{ flex: 1 }}
+                size="3"
+                variant="outline"
               >
                 {isLoading ? 'Testing...' : 'Test'}
               </Button>
-              <Button 
-                variant="soft" 
-                color="red"
-                onClick={handleClear}
-                disabled={isLoading}
-              >
-                Clear
-              </Button>
             </Flex>
 
-            {message && (
-              <Callout.Root color={message.type === 'success' ? 'green' : 'red'}>
-                <Callout.Text>{message.text}</Callout.Text>
-              </Callout.Root>
-            )}
+            <div style={{ marginTop: '24px', padding: '16px', background: 'var(--gray-3)', borderRadius: '8px' }}>
+              <Text size="2" weight="medium" style={{ marginBottom: '8px', display: 'block' }}>
+                Privacy & Security
+              </Text>
+              <Text size="1" style={{ color: 'var(--gray-11)', lineHeight: '1.5' }}>
+                • Your API key is stored locally in your browser and never shared<br/>
+                • Prompts are only sent to Google's Gemini API for analysis<br/>
+                • No data is collected or stored by PromptHero<br/>
+                • All communication uses HTTPS encryption
+              </Text>
+            </div>
+
+            <div style={{ marginTop: '16px', padding: '16px', background: 'var(--accent-3)', borderRadius: '8px' }}>
+              <Text size="2" weight="medium" style={{ marginBottom: '8px', display: 'block' }}>
+                How to Use PromptHero
+              </Text>
+              <Text size="1" style={{ color: 'var(--gray-12)', lineHeight: '1.5' }}>
+                1. Enter your API key above and click "Save"<br/>
+                2. Click the PromptHero icon in your browser toolbar<br/>
+                3. Type or paste any AI prompt you want to improve<br/>
+                4. Click "Score" to get quality ratings and feedback<br/>
+                5. Click "Optimize" to get an enhanced version of your prompt
+              </Text>
+            </div>
           </Flex>
         </Card>
-
-        <Separator size="4" />
-
-        {/* Help Section */}
-        <Card>
-          <Flex direction="column" gap="3">
-            <Heading size="4">Getting Your API Key</Heading>
-            
-            <Text size="2">
-              To use PromptHero, you'll need a Gemini API key from Google AI Studio:
-            </Text>
-            
-            <Box pl="4">
-              <Text size="2" style={{ display: 'block', marginBottom: '4px' }}>
-                1. Visit{' '}
-                <Text 
-                  color="blue" 
-                  style={{ cursor: 'pointer' }}
-                  onClick={() => chrome.tabs.create({ url: 'https://aistudio.google.com/app/apikey' })}
-                >
-                  Google AI Studio
-                </Text>
-              </Text>
-              <Text size="2" style={{ display: 'block', marginBottom: '4px' }}>
-                2. Sign in with your Google account
-              </Text>
-              <Text size="2" style={{ display: 'block', marginBottom: '4px' }}>
-                3. Click "Create API Key"
-              </Text>
-              <Text size="2" style={{ display: 'block' }}>
-                4. Copy the generated key and paste it above
-              </Text>
-            </Box>
-          </Flex>
-        </Card>
-
-        {/* Privacy Notice */}
-        <Card variant="surface">
-          <Flex direction="column" gap="2">
-            <Heading size="3">Privacy & Security</Heading>
-            <Text size="2" color="gray">
-              PromptHero prioritizes your privacy. Your API key and prompts are stored locally 
-              on your device and are only used to make requests to Google's Gemini API. 
-              No data is sent to any third-party servers or analytics services.
-            </Text>
-          </Flex>
-        </Card>
-      </Flex>
-    </Container>
+      </div>
+    </Theme>
   );
 };
 

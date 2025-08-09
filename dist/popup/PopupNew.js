@@ -50,7 +50,7 @@ const Popup = () => {
                 prompt: prompt.trim(),
                 currentScore: score,
                 improved,
-                improvedScore: improvedScore || undefined
+                improvedScore
             });
         }
         catch (error) {
@@ -75,9 +75,9 @@ const Popup = () => {
             // Save working state
             await saveWorkingState({
                 prompt: prompt.trim(),
-                currentScore: currentScore || undefined,
+                currentScore,
                 improved: result.improved_prompt,
-                improvedScore: improvedScore || undefined
+                improvedScore
             });
         }
         catch (error) {

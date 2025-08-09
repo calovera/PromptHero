@@ -1,181 +1,77 @@
-// Chrome storage helpers with TypeScript support
+import { HistoryEntry, Score } from './schema'
 
-export interface StorageData {
-  geminiApiKey?: string;
-  promptHistory?: HistoryItem[];
-  settings?: UserSettings;
+export async function getKey(): Promise<string | null> {
+  try {
+    const result = await chrome.storage.local.get(['gemini_api_key'])
+    return result.gemini_api_key || null
+  } catch (error) {
+    console.error('Failed to get API key:', error)
+    return null
+  }
 }
 
-export interface HistoryItem {
-  id: string;
-  originalPrompt: string;
-  improvedPrompt?: string;
-  score?: number;
-  timestamp: string; // ISO string
-  type: 'score' | 'optimize' | 'manual';
+export async function setKey(k: string): Promise<void> {
+  try {
+    await chrome.storage.local.set({ gemini_api_key: k })
+  } catch (error) {
+    console.error('Failed to set API key:', error)
+    throw error
+  }
 }
 
-export interface UserSettings {
-  maxHistoryItems: number;
-  autoSave: boolean;
-  theme: 'light' | 'dark' | 'system';
+export async function saveHistory(entry: HistoryEntry): Promise<void> {
+  try {
+    const result = await chrome.storage.local.get(['history'])
+    const history: HistoryEntry[] = result.history || []
+    
+    // Add new entry at the beginning
+    history.unshift(entry)
+    
+    // Keep only last 10 entries
+    const trimmedHistory = history.slice(0, 10)
+    
+    await chrome.storage.local.set({ history: trimmedHistory })
+  } catch (error) {
+    console.error('Failed to save history:', error)
+    throw error
+  }
 }
 
-// Default settings
-export const DEFAULT_SETTINGS: UserSettings = {
-  maxHistoryItems: 50,
-  autoSave: true,
-  theme: 'dark',
-};
-
-// Get single value from storage
-export const getStorageValue = async <K extends keyof StorageData>(
-  key: K
-): Promise<StorageData[K] | undefined> => {
+export async function loadHistory(): Promise<HistoryEntry[]> {
   try {
-    const result = await chrome.storage.sync.get([key]);
-    return result[key];
+    const result = await chrome.storage.local.get(['history'])
+    return result.history || []
   } catch (error) {
-    console.error(`Failed to get storage value for key ${key}:`, error);
-    return undefined;
+    console.error('Failed to load history:', error)
+    return []
   }
-};
+}
 
-// Get multiple values from storage
-export const getStorageValues = async <K extends keyof StorageData>(
-  keys: K[]
-): Promise<Pick<StorageData, K>> => {
+export async function saveWorkingState(state: {
+  prompt: string
+  currentScore?: Score
+  improved?: string
+  improvedScore?: Score
+}): Promise<void> {
   try {
-    const result = await chrome.storage.sync.get(keys);
-    return result as Pick<StorageData, K>;
+    await chrome.storage.local.set({ workingState: state })
   } catch (error) {
-    console.error('Failed to get storage values:', error);
-    return {} as Pick<StorageData, K>;
+    console.error('Failed to save working state:', error)
+    throw error
   }
-};
+}
 
-// Set single value in storage
-export const setStorageValue = async <K extends keyof StorageData>(
-  key: K,
-  value: StorageData[K]
-): Promise<void> => {
+export async function loadWorkingState(): Promise<{
+  prompt: string
+  currentScore?: Score
+  improved?: string
+  improvedScore?: Score
+} | null> {
   try {
-    await chrome.storage.sync.set({ [key]: value });
+    const result = await chrome.storage.local.get(['workingState'])
+    return result.workingState || null
   } catch (error) {
-    console.error(`Failed to set storage value for key ${key}:`, error);
-    throw error;
+    console.error('Failed to load working state:', error)
+    return null
   }
-};
-
-// Set multiple values in storage
-export const setStorageValues = async (data: Partial<StorageData>): Promise<void> => {
-  try {
-    await chrome.storage.sync.set(data);
-  } catch (error) {
-    console.error('Failed to set storage values:', error);
-    throw error;
-  }
-};
-
-// Remove values from storage
-export const removeStorageValues = async (keys: (keyof StorageData)[]): Promise<void> => {
-  try {
-    await chrome.storage.sync.remove(keys);
-  } catch (error) {
-    console.error('Failed to remove storage values:', error);
-    throw error;
-  }
-};
-
-// Clear all storage
-export const clearStorage = async (): Promise<void> => {
-  try {
-    await chrome.storage.sync.clear();
-  } catch (error) {
-    console.error('Failed to clear storage:', error);
-    throw error;
-  }
-};
-
-// API Key helpers
-export const getApiKey = async (): Promise<string | null> => {
-  const apiKey = await getStorageValue('geminiApiKey');
-  return apiKey || null;
-};
-
-export const setApiKey = async (apiKey: string): Promise<void> => {
-  await setStorageValue('geminiApiKey', apiKey);
-};
-
-export const removeApiKey = async (): Promise<void> => {
-  await removeStorageValues(['geminiApiKey']);
-};
-
-// History helpers
-export const getHistory = async (): Promise<HistoryItem[]> => {
-  const history = await getStorageValue('promptHistory');
-  return history || [];
-};
-
-export const addToHistory = async (item: Omit<HistoryItem, 'id' | 'timestamp'>): Promise<void> => {
-  const currentHistory = await getHistory();
-  const settings = await getSettings();
-  
-  const newItem: HistoryItem = {
-    ...item,
-    id: Date.now().toString(),
-    timestamp: new Date().toISOString(),
-  };
-  
-  const updatedHistory = [newItem, ...currentHistory].slice(0, settings.maxHistoryItems);
-  await setStorageValue('promptHistory', updatedHistory);
-};
-
-export const clearHistory = async (): Promise<void> => {
-  await setStorageValue('promptHistory', []);
-};
-
-export const removeFromHistory = async (id: string): Promise<void> => {
-  const currentHistory = await getHistory();
-  const updatedHistory = currentHistory.filter(item => item.id !== id);
-  await setStorageValue('promptHistory', updatedHistory);
-};
-
-// Settings helpers
-export const getSettings = async (): Promise<UserSettings> => {
-  const settings = await getStorageValue('settings');
-  return { ...DEFAULT_SETTINGS, ...settings };
-};
-
-export const updateSettings = async (newSettings: Partial<UserSettings>): Promise<void> => {
-  const currentSettings = await getSettings();
-  const updatedSettings = { ...currentSettings, ...newSettings };
-  await setStorageValue('settings', updatedSettings);
-};
-
-// Storage change listener
-export const addStorageChangeListener = (
-  callback: (changes: { [key: string]: chrome.storage.StorageChange }) => void
-): void => {
-  chrome.storage.onChanged.addListener(callback);
-};
-
-export const removeStorageChangeListener = (
-  callback: (changes: { [key: string]: chrome.storage.StorageChange }) => void
-): void => {
-  chrome.storage.onChanged.removeListener(callback);
-};
-
-// Utility function to check storage quota
-export const getStorageQuota = async (): Promise<{ used: number; total: number }> => {
-  try {
-    const usage = await chrome.storage.sync.getBytesInUse();
-    return {
-      used: usage,
-      total: chrome.storage.sync.QUOTA_BYTES,
-    };
-  } catch (error) {
-    console.error('Failed to get storage quota:', error);
-    return { used: 0, total: 0 };
-  }
-};
+}
