@@ -45,12 +45,12 @@ outputType = "console"
 name = "Build Extension"
 author = "agent"
 
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npm run build"
-
 [workflows.workflow.metadata]
 outputType = "console"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node build.js"
 
 [[workflows.workflow]]
 name = "Test Extension"
