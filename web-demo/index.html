@@ -527,6 +527,45 @@
             word-wrap: break-word;
         }
         
+        #streamingPrompt, #streamingExplanation {
+            color: var(--text-readable);
+            word-wrap: break-word;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+        
+        #streamingPrompt p, #streamingExplanation p {
+            margin: 8px 0;
+            line-height: 1.6;
+        }
+        
+        #streamingPrompt ul, #streamingExplanation ul {
+            margin: 8px 0;
+            padding-left: 20px;
+        }
+        
+        #streamingPrompt li, #streamingExplanation li {
+            margin: 4px 0;
+            line-height: 1.5;
+        }
+        
+        #streamingPrompt strong, #streamingExplanation strong {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        #streamingPrompt em, #streamingExplanation em {
+            color: var(--text-secondary);
+        }
+        
+        #streamingPrompt code, #streamingExplanation code {
+            background: rgba(255,255,255,0.2);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 13px;
+        }
+        
         .explanation-section {
             background: rgba(255, 255, 255, 0.18);
             border: 1px solid rgba(255, 255, 255, 0.25);
@@ -873,17 +912,36 @@
         }
         
         function formatMarkdown(text) {
-            return text
-                .replace(/\*\*(.*?)\*\*/g, '<strong style="color: var(--text-primary); font-weight: 600;">$1</strong>')
-                .replace(/\*(.*?)\*/g, '<em style="color: var(--text-secondary);">$1</em>')
-                .replace(/`(.*?)`/g, '<code style="background: rgba(255,255,255,0.2); color: var(--text-primary); padding: 2px 6px; border-radius: 4px; font-family: monospace;">$1</code>')
-                .replace(/^- (.+)$/gm, '<li style="color: var(--text-readable); margin: 4px 0; font-size: 14px; line-height: 1.6;">$1</li>')
-                .replace(/^(\d+)\. (.+)$/gm, '<li style="color: var(--text-readable); margin: 4px 0; font-size: 14px; line-height: 1.6;">$2</li>')
-                .replace(/(<li.*?<\/li>\s*)+/g, '<ul style="padding-left: 20px; margin: 8px 0;">$&</ul>')
-                .replace(/\n\n/g, '</p><p style="color: var(--text-readable); margin: 6px 0; line-height: 1.6; font-size: 14px;">')
-                .replace(/^(.+)$/gm, '<p style="color: var(--text-readable); margin: 4px 0; line-height: 1.6; font-size: 14px;">$1</p>')
-                .replace(/<p[^>]*><ul/g, '<ul')
-                .replace(/<\/ul><\/p>/g, '</ul>');
+            if (!text) return '';
+            
+            // Convert markdown to HTML with proper styling
+            let formatted = text
+                // Bold text
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                // Italic text
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                // Code blocks
+                .replace(/`(.*?)`/g, '<code>$1</code>')
+                // Bullet points
+                .replace(/^[\s]*[-•]\s+(.+)$/gm, '<li>$1</li>')
+                // Numbers lists
+                .replace(/^[\s]*\d+\.\s+(.+)$/gm, '<li>$1</li>')
+                // Wrap consecutive list items in ul tags
+                .replace(/((?:<li>.*<\/li>\s*)+)/gs, '<ul>$1</ul>')
+                // Paragraphs - split by double newlines
+                .split(/\n\s*\n/)
+                .map(para => para.trim())
+                .filter(para => para.length > 0)
+                .map(para => {
+                    // If it's already wrapped in ul or contains li, don't wrap in p
+                    if (para.includes('<ul>') || para.includes('<li>')) {
+                        return para;
+                    }
+                    return `<p>${para}</p>`;
+                })
+                .join('');
+            
+            return formatted;
         }
         
         function streamFromAPI(prompt, apiKey) {
@@ -951,8 +1009,8 @@
                 streamingPrompt.innerHTML += data.text;
             } else if (data.type === 'complete') {
                 // Parse and display the final structured response
-                document.getElementById('streamingPrompt').innerHTML = `<div style="color: var(--text-readable); line-height: 1.6;">${formatMarkdown(data.optimizedPrompt)}</div>`;
-                document.getElementById('streamingExplanation').innerHTML = formatMarkdown(data.explanation);
+                document.getElementById('streamingPrompt').innerHTML = formatMarkdown(data.optimizedPrompt) || data.optimizedPrompt;
+                document.getElementById('streamingExplanation').innerHTML = formatMarkdown(data.explanation) || data.explanation;
                 document.getElementById('copyBtn').style.display = 'inline-block';
                 optimizedPrompt = data.optimizedPrompt;
                 isStreaming = false;
