@@ -437,7 +437,7 @@
                             <div class="loading-icon">⚡</div>
                         </div>
                         <p>Creating your improved prompt...</p>
-                        <p style="color: #888; font-size: 14px; margin-top: 8px;">Streaming live AI response</p>
+                        <p style="color: #888; font-size: 14px; margin-top: 8px;">Processing with Gemini AI</p>
                     </div>
                     
                     <div class="streaming-container">
@@ -504,26 +504,16 @@
                 .replace(/\n/g, '<br>');
         }
         
-        function simulateStreaming(text, elementId, cursorId, onComplete) {
+        function displayInstantly(text, elementId, cursorId, onComplete) {
             const element = document.getElementById(elementId);
             const cursor = document.getElementById(cursorId);
-            let index = 0;
             
-            element.innerHTML = '';
-            cursor.style.display = 'inline';
+            element.innerHTML = text;
+            cursor.style.display = 'none';
             
-            function typeChar() {
-                if (index < text.length) {
-                    element.innerHTML += text.charAt(index);
-                    index++;
-                    setTimeout(typeChar, 50); // Typing speed
-                } else {
-                    cursor.style.display = 'none';
-                    if (onComplete) onComplete();
-                }
+            if (onComplete) {
+                setTimeout(onComplete, 100); // Small delay for smooth transition
             }
-            
-            typeChar();
         }
         
         function showError(message) {
@@ -674,11 +664,11 @@
                     // Hide streaming animation
                     document.getElementById('streamingAnimation').classList.remove('show');
                     
-                    // Start streaming the optimized prompt
-                    simulateStreaming(result.optimizedPrompt, 'streamingPrompt', 'promptCursor', () => {
-                        // After prompt is done, stream the explanation
-                        simulateStreaming(formatMarkdown(result.explanation), 'streamingExplanation', 'explanationCursor', () => {
-                            // Show copy button when streaming is complete
+                    // Display the optimized prompt instantly
+                    displayInstantly(result.optimizedPrompt, 'streamingPrompt', 'promptCursor', () => {
+                        // Then display the explanation
+                        displayInstantly(formatMarkdown(result.explanation), 'streamingExplanation', 'explanationCursor', () => {
+                            // Show copy button when display is complete
                             document.getElementById('copyBtn').style.display = 'inline-block';
                             isStreaming = false;
                         });
