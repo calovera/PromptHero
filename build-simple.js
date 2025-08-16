@@ -148,11 +148,36 @@ async function callGemini(system, user, opts) {
     return text;
 }
 
+// Helper function to extract JSON from markdown-formatted responses
+function extractJsonFromText(text) {
+    // Remove markdown code blocks using string methods
+    text = text.replace(/```json/g, '').replace(/```/g, '');
+    
+    // Trim whitespace
+    text = text.trim();
+    
+    // If it starts with { and ends with }, it's likely JSON
+    if (text.startsWith('{') && text.endsWith('}')) {
+        return text;
+    }
+    
+    // Try to find JSON object in the text
+    const startIndex = text.indexOf('{');
+    const endIndex = text.lastIndexOf('}');
+    if (startIndex !== -1 && endIndex !== -1 && endIndex > startIndex) {
+        return text.substring(startIndex, endIndex + 1);
+    }
+    
+    // If no JSON found, return the original text
+    return text;
+}
+
 async function callJson(system, user, validator, opts) {
     let text;
     try {
         text = await callGemini(system, user, opts);
-        const parsed = JSON.parse(text);
+        const jsonText = extractJsonFromText(text);
+        const parsed = JSON.parse(jsonText);
         if (!validator(parsed)) {
             throw new Error('Invalid response format');
         }
@@ -160,9 +185,10 @@ async function callJson(system, user, validator, opts) {
     }
     catch (error) {
         // Retry once with stricter instruction
-        const retrySystem = system + " Return VALID JSON only. No prose.";
+        const retrySystem = system + " Return VALID JSON only. No prose, no markdown formatting.";
         text = await callGemini(retrySystem, user, opts);
-        const parsed = JSON.parse(text);
+        const jsonText = extractJsonFromText(text);
+        const parsed = JSON.parse(jsonText);
         if (!validator(parsed)) {
             throw new Error('Invalid response format after retry');
         }

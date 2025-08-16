@@ -27,8 +27,26 @@ dirs.forEach((dir) => {
 
 // Copy static files
 fs.copyFileSync("manifest.json", "dist/manifest.json");
-fs.copyFileSync("src/popup/index.html", "dist/popup/index.html");
-fs.copyFileSync("src/options/index.html", "dist/options/index.html");
+
+// Copy and update popup HTML
+let popupHtml = fs.readFileSync("src/popup/index.html", "utf8");
+popupHtml = popupHtml.replace(/\.tsx/g, ".js");
+// Add CSS link
+popupHtml = popupHtml.replace(
+  "</head>",
+  '  <link rel="stylesheet" href="./index.css">\n</head>'
+);
+fs.writeFileSync("dist/popup/index.html", popupHtml);
+
+// Copy and update options HTML
+let optionsHtml = fs.readFileSync("src/options/index.html", "utf8");
+optionsHtml = optionsHtml.replace(/\.tsx/g, ".js");
+// Add CSS link
+optionsHtml = optionsHtml.replace(
+  "</head>",
+  '  <link rel="stylesheet" href="./index.css">\n</head>'
+);
+fs.writeFileSync("dist/options/index.html", optionsHtml);
 
 // Copy icons
 const iconFiles = fs.readdirSync("public/icons");
@@ -59,6 +77,7 @@ try {
     minify: false,
     sourcemap: false,
     external: ["chrome"],
+    loader: { ".css": "css" },
   });
   console.log("✅ Popup built successfully");
 } catch (error) {
@@ -79,6 +98,7 @@ try {
     minify: false,
     sourcemap: false,
     external: ["chrome"],
+    loader: { ".css": "css" },
   });
   console.log("✅ Options built successfully");
 } catch (error) {
@@ -86,25 +106,25 @@ try {
   process.exit(1);
 }
 
-  // Build background script with esbuild
-  console.log("Building background script...");
-  try {
-    await esbuild.build({
-      entryPoints: ["src/background/background.ts"],
-      bundle: true,
-      outfile: "dist/background/background.js",
-      format: "esm",
-      platform: "browser",
-      target: "es2020",
-      minify: false,
-      sourcemap: false,
-      external: ["chrome"],
-    });
-    console.log("✅ Background script built successfully");
-  } catch (error) {
-    console.error("❌ Background script build failed:", error);
-    process.exit(1);
-  }
+// Build background script with esbuild
+console.log("Building background script...");
+try {
+  await esbuild.build({
+    entryPoints: ["src/background/background.ts"],
+    bundle: true,
+    outfile: "dist/background/background.js",
+    format: "esm",
+    platform: "browser",
+    target: "es2020",
+    minify: false,
+    sourcemap: false,
+    external: ["chrome"],
+  });
+  console.log("✅ Background script built successfully");
+} catch (error) {
+  console.error("❌ Background script build failed:", error);
+  process.exit(1);
+}
 
 console.log("Build complete! Extension is ready in ./dist/");
 console.log("Load the extension in Chrome by:");

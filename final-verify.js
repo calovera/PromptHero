@@ -18,9 +18,11 @@ const criticalFiles = [
   "popup/index.html",
   "popup/index.js",
   "popup/index.css",
+  "popup/additional-styles.css",
   "options/index.html",
   "options/index.js",
   "options/index.css",
+  "options/additional-styles.css",
   "icons/icon-16.png",
   "icons/icon-32.png",
   "icons/icon-48.png",
@@ -76,11 +78,14 @@ for (const file of htmlFiles) {
     if (
       content.includes('<div id="root">') &&
       content.includes("./index.js") &&
-      content.includes("./index.css")
+      content.includes("./index.css") &&
+      content.includes("./additional-styles.css")
     ) {
-      console.log(`✅ ${file} - Correct structure with CSS`);
+      console.log(`✅ ${file} - Correct structure with responsive CSS`);
     } else {
-      console.error(`❌ ${file} - Incorrect structure or missing CSS`);
+      console.error(
+        `❌ ${file} - Incorrect structure or missing responsive CSS`
+      );
       allGood = false;
     }
   } catch (error) {

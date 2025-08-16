@@ -11637,19 +11637,23 @@ async function getApiKey() {
 async function ensureApiKeyOrThrow() {
   const apiKey = await getApiKey();
   if (!apiKey) {
-    throw new Error("API key not found. Please configure your Gemini API key in the options page.");
+    throw new Error(
+      "API key not found. Please configure your Gemini API key in the options page."
+    );
   }
   return apiKey;
 }
 async function callGemini(system, user, opts) {
   const apiKey = await ensureApiKeyOrThrow();
   const body = {
-    contents: [{
-      role: "user",
-      parts: [{ text: `${system}
+    contents: [
+      {
+        role: "user",
+        parts: [{ text: `${system}
 
 ${user}` }]
-    }],
+      }
+    ],
     generationConfig: {
       temperature: opts?.temperature ?? 0.3,
       maxOutputTokens: opts?.maxTokens ?? 256
@@ -11664,7 +11668,9 @@ ${user}` }]
     }
   );
   if (!response.ok) {
-    throw new Error(`Gemini API error: ${response.status} ${response.statusText}`);
+    throw new Error(
+      `Gemini API error: ${response.status} ${response.statusText}`
+    );
   }
   const data = await response.json();
   const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
@@ -11673,34 +11679,45 @@ ${user}` }]
   }
   return text;
 }
+function extractJsonFromText(text) {
+  text = text.replace(/```json\s*/gi, "").replace(/```\s*$/gi, "");
+  text = text.replace(/```\s*/gi, "").replace(/```\s*$/gi, "");
+  text = text.trim();
+  if (text.startsWith("{") && text.endsWith("}")) {
+    return text;
+  }
+  const jsonMatch = text.match(/\{[\s\S]*\}/);
+  if (jsonMatch) {
+    return jsonMatch[0];
+  }
+  return text;
+}
 async function callJson(system, user, schema, opts) {
   let text;
   try {
     text = await callGemini(system, user, opts);
-    const parsed = JSON.parse(text);
+    const jsonText = extractJsonFromText(text);
+    const parsed = JSON.parse(jsonText);
     return schema.parse(parsed);
   } catch (error43) {
-    const retrySystem = system + " Return VALID JSON only. No prose.";
+    const retrySystem = system + " Return VALID JSON only. No prose, no markdown formatting.";
     text = await callGemini(retrySystem, user, opts);
-    const parsed = JSON.parse(text);
+    const jsonText = extractJsonFromText(text);
+    const parsed = JSON.parse(jsonText);
     return schema.parse(parsed);
   }
 }
 async function scorePrompt(prompt) {
-  return callJson(
-    SCORER_SYSTEM,
-    SCORER_USER(prompt),
-    ScoreSchema,
-    { temperature: 0.1, maxTokens: 128 }
-  );
+  return callJson(SCORER_SYSTEM, SCORER_USER(prompt), ScoreSchema, {
+    temperature: 0.1,
+    maxTokens: 128
+  });
 }
 async function optimizePrompt(prompt) {
-  return callJson(
-    OPTIMIZER_SYSTEM,
-    OPTIMIZER_USER(prompt),
-    OptimizeSchema,
-    { temperature: 0.5, maxTokens: 512 }
-  );
+  return callJson(OPTIMIZER_SYSTEM, OPTIMIZER_USER(prompt), OptimizeSchema, {
+    temperature: 0.5,
+    maxTokens: 512
+  });
 }
 async function testApiKey() {
   const result = await callJson(
