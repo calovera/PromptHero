@@ -9,11 +9,11 @@ interface ScorePanelProps {
 const ScorePanel: React.FC<ScorePanelProps> = ({ title, score }) => {
   if (!score) {
     return (
-      <div className="glassmorphic" style={{ padding: '16px', marginBottom: '20px' }}>
-        <div className="input-label" style={{ marginBottom: '8px' }}>
+      <div className="glassmorphic" style={{ padding: '14px', marginBottom: '16px' }}>
+        <div className="input-label" style={{ marginBottom: '6px' }}>
           {title}
         </div>
-        <div style={{ color: 'var(--text-muted)', fontSize: '14px' }}>
+        <div style={{ color: 'var(--text-muted)', fontSize: '13px' }}>
           Enter a prompt and click "Score Prompt" to get your rating
         </div>
       </div>
@@ -33,21 +33,21 @@ const ScorePanel: React.FC<ScorePanelProps> = ({ title, score }) => {
   };
 
   return (
-    <div className="glassmorphic" style={{ padding: '16px', marginBottom: '20px' }}>
+    <div className="glassmorphic" style={{ padding: '14px', marginBottom: '16px' }}>
       <div style={{ 
         display: 'flex', 
         justifyContent: 'space-between', 
         alignItems: 'center', 
-        marginBottom: '16px' 
+        marginBottom: '12px' 
       }}>
         <div className="input-label">{title}</div>
         <div style={{
           background: getScoreBg(score.score),
           border: `1px solid ${getScoreColor(score.score)}`,
-          borderRadius: '20px',
-          padding: '6px 12px',
+          borderRadius: '16px',
+          padding: '4px 10px',
           color: getScoreColor(score.score),
-          fontSize: '14px',
+          fontSize: '13px',
           fontWeight: '600'
         }}>
           {score.score}/100

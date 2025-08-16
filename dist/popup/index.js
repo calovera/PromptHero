@@ -23592,9 +23592,9 @@
   var import_jsx_runtime11 = __toESM(require_jsx_runtime(), 1);
   var ScorePanel = ({ title, score }) => {
     if (!score) {
-      return /* @__PURE__ */ (0, import_jsx_runtime11.jsxs)("div", { className: "glassmorphic", style: { padding: "16px", marginBottom: "20px" }, children: [
-        /* @__PURE__ */ (0, import_jsx_runtime11.jsx)("div", { className: "input-label", style: { marginBottom: "8px" }, children: title }),
-        /* @__PURE__ */ (0, import_jsx_runtime11.jsx)("div", { style: { color: "var(--text-muted)", fontSize: "14px" }, children: 'Enter a prompt and click "Score Prompt" to get your rating' })
+      return /* @__PURE__ */ (0, import_jsx_runtime11.jsxs)("div", { className: "glassmorphic", style: { padding: "14px", marginBottom: "16px" }, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime11.jsx)("div", { className: "input-label", style: { marginBottom: "6px" }, children: title }),
+        /* @__PURE__ */ (0, import_jsx_runtime11.jsx)("div", { style: { color: "var(--text-muted)", fontSize: "13px" }, children: 'Enter a prompt and click "Score Prompt" to get your rating' })
       ] });
     }
     const getScoreColor = (score2) => {
@@ -23607,21 +23607,21 @@
       if (score2 >= 60) return "rgba(245, 158, 11, 0.1)";
       return "rgba(239, 68, 68, 0.1)";
     };
-    return /* @__PURE__ */ (0, import_jsx_runtime11.jsxs)("div", { className: "glassmorphic", style: { padding: "16px", marginBottom: "20px" }, children: [
+    return /* @__PURE__ */ (0, import_jsx_runtime11.jsxs)("div", { className: "glassmorphic", style: { padding: "14px", marginBottom: "16px" }, children: [
       /* @__PURE__ */ (0, import_jsx_runtime11.jsxs)("div", { style: {
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
-        marginBottom: "16px"
+        marginBottom: "12px"
       }, children: [
         /* @__PURE__ */ (0, import_jsx_runtime11.jsx)("div", { className: "input-label", children: title }),
         /* @__PURE__ */ (0, import_jsx_runtime11.jsxs)("div", { style: {
           background: getScoreBg(score.score),
           border: `1px solid ${getScoreColor(score.score)}`,
-          borderRadius: "20px",
-          padding: "6px 12px",
+          borderRadius: "16px",
+          padding: "4px 10px",
           color: getScoreColor(score.score),
-          fontSize: "14px",
+          fontSize: "13px",
           fontWeight: "600"
         }, children: [
           score.score,
@@ -23965,30 +23965,30 @@
         
         .glassmorphic {
           background: rgba(255, 255, 255, 0.08);
-          border: 1px solid rgba(255, 255, 255, 0.12);
-          border-radius: 12px;
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          border-radius: 8px;
           backdrop-filter: blur(20px);
         }
         
         .tab-container {
           display: flex;
-          background: rgba(255, 255, 255, 0.05);
-          border-radius: 16px;
-          padding: 4px;
-          margin-bottom: 20px;
-          border: 1px solid rgba(255, 255, 255, 0.1);
+          background: rgba(255, 255, 255, 0.08);
+          border-radius: 12px;
+          padding: 3px;
+          margin-bottom: 16px;
+          border: 1px solid rgba(255, 255, 255, 0.15);
         }
         
         .tab-button {
           flex: 1;
-          padding: 12px 16px;
+          padding: 10px 14px;
           border: none;
-          border-radius: 12px;
+          border-radius: 9px;
           font-family: inherit;
-          font-size: 14px;
+          font-size: 13px;
           font-weight: 500;
           cursor: pointer;
-          transition: all 0.3s ease;
+          transition: all 0.2s ease;
           position: relative;
           overflow: hidden;
         }
@@ -24015,31 +24015,32 @@
         }
         
         .input-container {
-          margin-bottom: 20px;
+          margin-bottom: 16px;
         }
         
         .input-label {
           color: var(--text-readable);
           font-size: 14px;
           font-weight: 500;
-          margin-bottom: 8px;
+          margin-bottom: 12px;
           display: block;
         }
         
         .prompt-textarea {
           width: 100%;
-          min-height: 120px;
-          max-height: 200px;
-          padding: 16px;
-          background: rgba(255, 255, 255, 0.05);
-          border: 1px solid rgba(255, 255, 255, 0.15);
-          border-radius: 10px;
+          min-height: 100px;
+          max-height: 160px;
+          padding: 14px;
+          background: rgba(255, 255, 255, 0.08);
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          border-radius: 8px;
           color: var(--text-primary);
           font-size: 14px;
-          line-height: 1.5;
+          line-height: 1.4;
           resize: vertical;
           font-family: inherit;
           transition: all 0.2s ease;
+          box-sizing: border-box;
         }
         
         .prompt-textarea:focus {
@@ -24054,17 +24055,17 @@
         
         .button-group {
           display: flex;
-          gap: 12px;
-          margin-bottom: 20px;
+          gap: 10px;
+          margin-bottom: 16px;
         }
         
         .action-button {
           flex: 1;
-          padding: 14px;
+          padding: 12px;
           border: none;
-          border-radius: 10px;
+          border-radius: 8px;
           font-family: inherit;
-          font-size: 14px;
+          font-size: 13px;
           font-weight: 600;
           cursor: pointer;
           transition: all 0.2s ease;
@@ -24160,18 +24161,19 @@
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 8px;
+          gap: 6px;
           width: 100%;
-          padding: 10px;
+          padding: 8px;
           background: rgba(255,255,255,0.08);
           color: var(--text-secondary);
-          border: 1px solid rgba(255,255,255,0.12);
-          border-radius: 8px;
+          border: 1px solid rgba(255,255,255,0.15);
+          border-radius: 6px;
           font-family: inherit;
           font-size: 12px;
           cursor: pointer;
           transition: all 0.2s ease;
           margin-top: auto;
+          margin-bottom: 0;
         }
         
         .settings-button:hover {
@@ -24309,7 +24311,7 @@
                 /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(p, { size: "3", weight: "medium", style: { color: "white", marginBottom: "8px", display: "block" }, children: isScoring ? "Analyzing your prompt..." : "Creating your improved prompt..." }),
                 /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(p, { size: "2", style: { color: "#888" }, children: isScoring ? "This might take a few seconds" : "Processing with Gemini AI" })
               ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("div", { style: { marginTop: "auto", paddingTop: "20px" }, children: /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("div", { style: { marginTop: "auto", paddingTop: "16px", paddingBottom: "4px" }, children: /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
                 "button",
                 {
                   className: "settings-button",
