@@ -22,7 +22,7 @@ Preferred communication style: Simple, everyday language.
 # System Architecture
 
 ## Frontend Architecture
-- **Framework**: React with TypeScript using Vite as the build tool
+- **Framework**: React with TypeScript using esbuild as the build tool
 - **UI Components**: Radix UI primitives with @radix-ui/themes for consistent dark mode theming
 - **Animations**: Lottie React for smooth loading animations during API calls
 - **Component Structure**: Fully modular approach with dedicated components:
@@ -66,7 +66,7 @@ Preferred communication style: Simple, everyday language.
 
 ## Core Framework Dependencies
 - **React**: Frontend UI framework with TypeScript support
-- **Vite**: Build tool and development server
+- **esbuild**: Fast JavaScript bundler and build tool
 - **@radix-ui/themes**: Component library providing dark theme UI components
 - **@radix-ui/react-***: Individual Radix UI primitive components
 - **zod**: Runtime type validation and schema definition

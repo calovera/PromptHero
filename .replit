@@ -20,15 +20,15 @@ args = "Install Dependencies"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Build Extension"
-
-[[workflows.workflow.tasks]]
-task = "workflow.run"
 args = "Test Extension"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
 args = "Web Demo Server"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Build Extension"
 
 [[workflows.workflow]]
 name = "Install Dependencies"
@@ -40,17 +40,6 @@ args = "npm install"
 
 [workflows.workflow.metadata]
 outputType = "console"
-
-[[workflows.workflow]]
-name = "Build Extension"
-author = "agent"
-
-[workflows.workflow.metadata]
-outputType = "console"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "node build.js"
 
 [[workflows.workflow]]
 name = "Test Extension"
@@ -69,8 +58,22 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "cd web-demo && node server.js"
+args = "cd web-demo && node server.cjs"
 waitForPort = 5000
+
+[workflows.workflow.metadata]
+outputType = "webview"
+
+[[workflows.workflow]]
+name = "Build Extension"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "chmod +x build-esbuild.js && node --max-old-space-size=512 build-esbuild.js"
+
+[workflows.workflow.metadata]
+outputType = "console"
 
 [[ports]]
 localPort = 5000
