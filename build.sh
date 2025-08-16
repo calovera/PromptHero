@@ -2,27 +2,20 @@
 
 echo "Building PromptHero Chrome Extension..."
 
-# Create dist directory
-mkdir -p dist/popup
-mkdir -p dist/options
-mkdir -p dist/background
-mkdir -p dist/icons
+# Build with Vite
+echo "Building with Vite..."
+npx vite build
 
-# Copy HTML files
-cp src/popup/index.html dist/popup/
-cp src/options/index.html dist/options/
-
-# Copy manifest
+# Copy manifest and icons
+echo "Copying manifest and assets..."
 cp manifest.json dist/
-
-# Copy icons
+mkdir -p dist/icons
 cp public/icons/*.png dist/icons/
 
-# Build TypeScript files
-echo "Compiling TypeScript..."
-npx tsc --outDir dist --project tsconfig.json
+# Copy animations
+mkdir -p dist/animations
+cp src/animations/*.json dist/animations/
 
-# Copy any additional assets
 echo "Build complete! Extension is ready in ./dist/"
 echo "Load the extension in Chrome by:"
 echo "1. Open Chrome and go to chrome://extensions/"

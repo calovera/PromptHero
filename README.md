@@ -27,6 +27,33 @@ PromptHero is a powerful Chrome extension that helps you optimize your AI prompt
 
 ## ⚙️ Setup
 
+### For Development/Testing
+
+1. **Set up Environment Variables**:
+   ```bash
+   # Run the automated setup (recommended)
+   npm run setup
+   
+   # Or manually configure environment
+   # Create env.config.js with your API keys
+   ```
+
+2. **Build and Load Extension**:
+   ```bash
+   # Build the extension
+   npm run build
+   
+   # Configure API key for development
+   npm run setup:dev
+   
+   # Load in Chrome
+   # 1. Open chrome://extensions/
+   # 2. Enable "Developer mode"
+   # 3. Click "Load unpacked" and select ./dist folder
+   ```
+
+### For End Users
+
 1. **Get a Gemini API Key**:
    - Visit [Google AI Studio](https://aistudio.google.com/app/apikey)
    - Create a free API key

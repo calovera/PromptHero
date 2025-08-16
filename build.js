@@ -1,66 +1,59 @@
-import { build } from 'vite';
-import { resolve } from 'path';
-import { createRequire } from 'module';
-
-const require = createRequire(import.meta.url);
+import { build } from "vite";
+import { resolve } from "path";
 
 async function buildExtension() {
-  console.log('Building PromptHero Chrome Extension...');
+  console.log("Building PromptHero Chrome Extension...");
 
   // Build popup
   await build({
     configFile: false,
     build: {
-      outDir: 'dist/popup',
+      outDir: "dist/popup",
       rollupOptions: {
-        input: resolve('src/popup/index.html'),
+        input: resolve("src/popup/index.html"),
         output: {
-          entryFileNames: 'index.js',
-          chunkFileNames: '[name].js',
-          assetFileNames: '[name].[ext]'
-        }
-      }
+          entryFileNames: "index.js",
+          chunkFileNames: "[name].js",
+          assetFileNames: "[name].[ext]",
+        },
+      },
     },
-    plugins: [
-      require('@vitejs/plugin-react').default()
-    ]
+    plugins: [(await import("@vitejs/plugin-react")).default()],
   });
 
   // Build options
   await build({
     configFile: false,
     build: {
-      outDir: 'dist/options',
+      outDir: "dist/options",
       rollupOptions: {
-        input: resolve('src/options/index.html'),
+        input: resolve("src/options/index.html"),
         output: {
-          entryFileNames: 'index.js',
-          chunkFileNames: '[name].js',
-          assetFileNames: '[name].[ext]'
-        }
-      }
+          entryFileNames: "index.js",
+          chunkFileNames: "[name].js",
+          assetFileNames: "[name].[ext]",
+        },
+      },
     },
-    plugins: [
-      require('@vitejs/plugin-react').default()
-    ]
+    plugins: [(await import("@vitejs/plugin-react")).default()],
   });
 
   // Build background script
   await build({
     configFile: false,
     build: {
-      outDir: 'dist/background',
+      outDir: "dist/background",
       rollupOptions: {
-        input: resolve('src/background/background.ts'),
+        input: resolve("src/background/background.ts"),
         output: {
-          entryFileNames: 'background.js',
-          format: 'es'
-        }
-      }
-    }
+          entryFileNames: "background.js",
+          format: "es",
+        },
+      },
+    },
   });
 
-  console.log('Build complete!');
+  console.log("Build complete!");
 }
 
 buildExtension().catch(console.error);

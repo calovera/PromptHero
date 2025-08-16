@@ -1,4 +1,75 @@
+#!/usr/bin/env node
 
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+import { execSync } from "child_process";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+console.log("Building PromptHero Chrome Extension...");
+
+// Create dist directory structure
+const dirs = [
+  "dist/popup",
+  "dist/options",
+  "dist/background",
+  "dist/icons",
+  "dist/lib",
+  "dist/animations",
+];
+dirs.forEach((dir) => {
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+});
+
+// Copy HTML files
+fs.copyFileSync("src/popup/index.html", "dist/popup/index.html");
+fs.copyFileSync("src/options/index.html", "dist/options/index.html");
+
+// Copy manifest
+fs.copyFileSync("manifest.json", "dist/manifest.json");
+
+// Copy icons
+const iconFiles = fs.readdirSync("public/icons");
+iconFiles.forEach((file) => {
+  if (file.endsWith(".png")) {
+    fs.copyFileSync(`public/icons/${file}`, `dist/icons/${file}`);
+  }
+});
+
+// Copy animations
+const animationFiles = fs.readdirSync("src/animations");
+animationFiles.forEach((file) => {
+  if (file.endsWith(".json")) {
+    fs.copyFileSync(`src/animations/${file}`, `dist/animations/${file}`);
+  }
+});
+
+// Build TypeScript files with tsc
+console.log("Compiling TypeScript...");
+try {
+  execSync("npx tsc --outDir dist --project tsconfig.json", {
+    stdio: "inherit",
+  });
+} catch (error) {
+  console.error("TypeScript compilation failed:", error.message);
+  process.exit(1);
+}
+
+// Manually bundle the background script with dependencies
+console.log("Bundling background script...");
+const backgroundScript = fs.readFileSync(
+  "dist/background/background.js",
+  "utf8"
+);
+const geminiScript = fs.readFileSync("dist/background/gemini.js", "utf8");
+const schemaScript = fs.readFileSync("dist/lib/schema.js", "utf8");
+
+// Create a bundled background script
+const bundledBackground = `
 // Bundled background script for PromptHero
 import { z } from "zod";
 
@@ -16,16 +87,16 @@ const OptimizeSchema = z.object({
 
 // Gemini API functions
 const SCORER_SYSTEM = "You are a prompt quality judge. Return JSON only that passes this schema: { score: number 0..100, issues: string[], suggestions: string[] }. Scoring rubric: Clarity 25, Specificity 25, Constraints 20, Context 15, Output format 10, Token efficiency 5. Keep issues and suggestions short and actionable. No extra text.";
-const SCORER_USER = (template) => `Evaluate this prompt.
+const SCORER_USER = (template) => \`Evaluate this prompt.
 PROMPT
-${template}
-Return JSON only.`;
+\${template}
+Return JSON only.\`;
 
 const OPTIMIZER_SYSTEM = "You are a prompt engineer. Rewrite the prompt to maximize task success while keeping the same goal. If the prompt is vague or brief, infer reasonable defaults and add missing context requests and constraints. Add clear step-by-step instructions. Specify the desired output format. Keep it concise and token-efficient. Return JSON only that passes: { improved_prompt: string, checklist: string[] }. Checklist lists what you improved. No extra text.";
-const OPTIMIZER_USER = (template) => `Rewrite this prompt.
+const OPTIMIZER_USER = (template) => \`Rewrite this prompt.
 PROMPT
-${template}
-Return JSON only.`;
+\${template}
+Return JSON only.\`;
 
 async function getApiKey() {
     try {
@@ -51,20 +122,20 @@ async function callGemini(system, user, opts) {
     const body = {
         contents: [{
                 role: "user",
-                parts: [{ text: `${system}\n\n${user}` }]
+                parts: [{ text: \`\${system}\\n\\n\${user}\` }]
             }],
         generationConfig: {
             temperature: opts?.temperature ?? 0.3,
             maxOutputTokens: opts?.maxTokens ?? 256
         }
     };
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${apiKey}`, {
+    const response = await fetch(\`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=\${apiKey}\`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
     });
     if (!response.ok) {
-        throw new Error(`Gemini API error: ${response.status} ${response.statusText}`);
+        throw new Error(\`Gemini API error: \${response.status} \${response.statusText}\`);
     }
     const data = await response.json();
     const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
@@ -99,7 +170,7 @@ async function optimizePrompt(prompt) {
 }
 
 async function testApiKey() {
-    const result = await callJson("Return JSON only: { ok: true }", "Return {\"ok\":true}", z.object({ ok: z.boolean() }), { temperature: 0, maxTokens: 32 });
+    const result = await callJson("Return JSON only: { ok: true }", "Return {\\"ok\\":true}", z.object({ ok: z.boolean() }), { temperature: 0, maxTokens: 32 });
     return result;
 }
 
@@ -136,3 +207,16 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     // Return true to keep async channel open
     return true;
 });
+`;
+
+fs.writeFileSync("dist/background/background.js", bundledBackground);
+
+// Clean up individual files
+fs.unlinkSync("dist/background/gemini.js");
+fs.unlinkSync("dist/lib/schema.js");
+
+console.log("Build complete! Extension is ready in ./dist/");
+console.log("Load the extension in Chrome by:");
+console.log("1. Open Chrome and go to chrome://extensions/");
+console.log("2. Enable Developer mode");
+console.log('3. Click "Load unpacked" and select the ./dist folder');

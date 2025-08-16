@@ -1,8 +1,14 @@
 {
   "name": "workspace",
   "version": "1.0.0",
+  "type": "module",
   "main": "index.js",
   "scripts": {
+    "build": "node build-simple.js",
+    "build:dev": "node build-simple.js",
+    "build:vite": "node build.js",
+    "setup": "node setup-env.js",
+    "setup:dev": "node setup-dev.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
