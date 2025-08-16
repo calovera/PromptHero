@@ -23715,7 +23715,9 @@
         setHistory(updatedHistory);
       } catch (error2) {
         console.error("Score error:", error2);
-        setError(error2 instanceof Error ? error2.message : "Failed to score prompt");
+        setError(
+          error2 instanceof Error ? error2.message : "Failed to score prompt"
+        );
       } finally {
         setIsScoring(false);
       }
@@ -23755,7 +23757,9 @@
         setHistory(updatedHistory);
       } catch (error2) {
         console.error("Optimize error:", error2);
-        setError(error2 instanceof Error ? error2.message : "Failed to optimize prompt");
+        setError(
+          error2 instanceof Error ? error2.message : "Failed to optimize prompt"
+        );
       } finally {
         setIsOptimizing(false);
       }
@@ -24122,52 +24126,80 @@
               }
             ),
             /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(p7, { direction: "column", gap: "4", style: { height: "100%" }, children: [
-              /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(p7, { direction: "column", align: "center", gap: "2", style: { marginBottom: "16px" }, children: [
-                /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("h1", { className: "header-title", children: "PromptHero" }),
-                /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(p, { size: "2", style: { color: "var(--text-secondary)", textAlign: "center" }, children: "AI Prompt Optimizer" })
-              ] }),
-              !apiKeyConfigured && /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("div", { style: {
-                background: "rgba(239, 68, 68, 0.1)",
-                border: "1px solid rgba(239, 68, 68, 0.3)",
-                borderRadius: "8px",
-                padding: "10px 12px",
-                marginBottom: "12px",
-                fontSize: "13px",
-                color: "#fca5a5",
-                display: "flex",
-                alignItems: "center",
-                gap: "8px"
-              }, children: [
-                /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("span", { children: "\u26A0\uFE0F API key not configured." }),
-                /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
-                  "button",
-                  {
-                    onClick: openOptions,
-                    style: {
-                      background: "transparent",
-                      border: "1px solid rgba(252, 165, 165, 0.5)",
-                      borderRadius: "4px",
-                      color: "#fca5a5",
-                      padding: "2px 6px",
-                      fontSize: "11px",
-                      cursor: "pointer"
-                    },
-                    children: "Open Options"
-                  }
-                )
-              ] }),
-              error && /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("div", { style: {
-                background: "rgba(239, 68, 68, 0.1)",
-                border: "1px solid rgba(239, 68, 68, 0.3)",
-                borderRadius: "8px",
-                padding: "10px 12px",
-                marginBottom: "12px",
-                fontSize: "13px",
-                color: "#fca5a5"
-              }, children: [
-                "\u26A0\uFE0F ",
-                error
-              ] }),
+              /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(
+                p7,
+                {
+                  direction: "column",
+                  align: "center",
+                  gap: "2",
+                  style: { marginBottom: "16px" },
+                  children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("h1", { className: "header-title", children: "PromptHero" }),
+                    /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
+                      p,
+                      {
+                        size: "2",
+                        style: { color: "var(--text-secondary)", textAlign: "center" },
+                        children: "AI Prompt Optimizer"
+                      }
+                    )
+                  ]
+                }
+              ),
+              !apiKeyConfigured && /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(
+                "div",
+                {
+                  style: {
+                    background: "rgba(239, 68, 68, 0.1)",
+                    border: "1px solid rgba(239, 68, 68, 0.3)",
+                    borderRadius: "8px",
+                    padding: "10px 12px",
+                    marginBottom: "12px",
+                    fontSize: "13px",
+                    color: "#fca5a5",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px"
+                  },
+                  children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("span", { children: "\u26A0\uFE0F API key not configured." }),
+                    /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
+                      "button",
+                      {
+                        onClick: openOptions,
+                        style: {
+                          background: "transparent",
+                          border: "1px solid rgba(252, 165, 165, 0.5)",
+                          borderRadius: "4px",
+                          color: "#fca5a5",
+                          padding: "2px 6px",
+                          fontSize: "11px",
+                          cursor: "pointer"
+                        },
+                        children: "Open Options"
+                      }
+                    )
+                  ]
+                }
+              ),
+              error && /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(
+                "div",
+                {
+                  style: {
+                    background: "rgba(239, 68, 68, 0.1)",
+                    border: "1px solid rgba(239, 68, 68, 0.3)",
+                    borderRadius: "8px",
+                    padding: "10px 12px",
+                    marginBottom: "12px",
+                    fontSize: "13px",
+                    color: "#fca5a5"
+                  },
+                  children: [
+                    "\u26A0\uFE0F ",
+                    error
+                  ]
+                }
+              ),
               /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("div", { className: "tab-container", children: [
                 /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
                   "button",
@@ -24188,123 +24220,165 @@
               ] }),
               !improvedPrompt ? /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(import_jsx_runtime13.Fragment, { children: [
                 /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("div", { style: { marginBottom: "12px" }, children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("div", { style: {
-                    color: "var(--text-readable)",
-                    fontSize: "14px",
-                    fontWeight: "500",
-                    marginBottom: "8px"
-                  }, children: "Enter your AI prompt:" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("div", { style: {
-                    background: "rgba(255, 255, 255, 0.08)",
-                    border: "1px solid rgba(255, 255, 255, 0.2)",
-                    borderRadius: "8px",
-                    padding: "12px"
-                  }, children: /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
-                    "textarea",
-                    {
-                      value: prompt,
-                      onChange: (e18) => setPrompt(e18.target.value),
-                      placeholder: "Example: Write a story about a robot learning to feel emotions...",
-                      disabled: isLoading,
-                      style: {
-                        width: "100%",
-                        minHeight: "100px",
-                        background: "transparent",
-                        border: "none",
-                        color: "var(--text-primary)",
-                        fontSize: "14px",
-                        lineHeight: "1.4",
-                        resize: "vertical",
-                        fontFamily: "inherit",
-                        outline: "none",
-                        boxSizing: "border-box"
-                      }
-                    }
-                  ) })
-                ] }),
-                /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("div", { style: { display: "flex", gap: "8px", marginBottom: "12px" }, children: [
                   /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
-                    "button",
+                    "div",
                     {
-                      onClick: handleScore,
-                      disabled: !prompt.trim() || isLoading || !apiKeyConfigured,
                       style: {
-                        flex: 1,
-                        padding: "10px",
-                        background: "linear-gradient(135deg, #3b82f6, #1d4ed8)",
-                        color: "white",
-                        border: "none",
-                        borderRadius: "8px",
-                        fontSize: "13px",
-                        fontWeight: "600",
-                        cursor: !prompt.trim() || isLoading || !apiKeyConfigured ? "not-allowed" : "pointer",
-                        opacity: !prompt.trim() || isLoading || !apiKeyConfigured ? 0.5 : 1,
-                        transition: "all 0.2s ease"
+                        color: "var(--text-readable)",
+                        fontSize: "14px",
+                        fontWeight: "500",
+                        marginBottom: "8px"
                       },
-                      children: "\u{1F4CA} Score Prompt"
+                      children: "Enter your AI prompt:"
                     }
                   ),
                   /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
-                    "button",
+                    "div",
                     {
-                      onClick: handleOptimize,
-                      disabled: !prompt.trim() || isLoading || !apiKeyConfigured,
                       style: {
-                        flex: 1,
-                        padding: "10px",
-                        background: "linear-gradient(135deg, #10b981, #059669)",
-                        color: "white",
-                        border: "none",
+                        background: "rgba(255, 255, 255, 0.08)",
+                        border: "1px solid rgba(255, 255, 255, 0.2)",
                         borderRadius: "8px",
-                        fontSize: "13px",
-                        fontWeight: "600",
-                        cursor: !prompt.trim() || isLoading || !apiKeyConfigured ? "not-allowed" : "pointer",
-                        opacity: !prompt.trim() || isLoading || !apiKeyConfigured ? 0.5 : 1,
-                        transition: "all 0.2s ease"
+                        padding: "12px"
                       },
-                      children: "\u26A1 Optimize Prompt"
+                      children: /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
+                        "textarea",
+                        {
+                          value: prompt,
+                          onChange: (e18) => setPrompt(e18.target.value),
+                          placeholder: "Example: Write a story about a robot learning to feel emotions...",
+                          disabled: isLoading,
+                          style: {
+                            width: "100%",
+                            minHeight: "100px",
+                            background: "transparent",
+                            border: "none",
+                            color: "var(--text-primary)",
+                            fontSize: "14px",
+                            lineHeight: "1.4",
+                            resize: "vertical",
+                            fontFamily: "inherit",
+                            outline: "none",
+                            boxSizing: "border-box"
+                          }
+                        }
+                      )
                     }
                   )
                 ] }),
+                /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(
+                  "div",
+                  {
+                    style: { display: "flex", gap: "8px", marginBottom: "12px" },
+                    children: [
+                      /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
+                        "button",
+                        {
+                          onClick: handleScore,
+                          disabled: !prompt.trim() || isLoading || !apiKeyConfigured,
+                          style: {
+                            flex: 1,
+                            padding: "10px",
+                            background: "linear-gradient(135deg, #3b82f6, #1d4ed8)",
+                            color: "white",
+                            border: "none",
+                            borderRadius: "8px",
+                            fontSize: "13px",
+                            fontWeight: "600",
+                            cursor: !prompt.trim() || isLoading || !apiKeyConfigured ? "not-allowed" : "pointer",
+                            opacity: !prompt.trim() || isLoading || !apiKeyConfigured ? 0.5 : 1,
+                            transition: "all 0.2s ease"
+                          },
+                          children: "\u{1F4CA} Score Prompt"
+                        }
+                      ),
+                      /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
+                        "button",
+                        {
+                          onClick: handleOptimize,
+                          disabled: !prompt.trim() || isLoading || !apiKeyConfigured,
+                          style: {
+                            flex: 1,
+                            padding: "10px",
+                            background: "linear-gradient(135deg, #10b981, #059669)",
+                            color: "white",
+                            border: "none",
+                            borderRadius: "8px",
+                            fontSize: "13px",
+                            fontWeight: "600",
+                            cursor: !prompt.trim() || isLoading || !apiKeyConfigured ? "not-allowed" : "pointer",
+                            opacity: !prompt.trim() || isLoading || !apiKeyConfigured ? 0.5 : 1,
+                            transition: "all 0.2s ease"
+                          },
+                          children: "\u26A1 Optimize Prompt"
+                        }
+                      )
+                    ]
+                  }
+                ),
                 /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(ScorePanel_default, { title: "Prompt Score", score: originalScore })
               ] }) : /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(import_jsx_runtime13.Fragment, { children: [
                 /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("div", { style: { marginBottom: "12px" }, children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("div", { style: {
-                    color: "var(--text-readable)",
-                    fontSize: "14px",
-                    fontWeight: "500",
-                    marginBottom: "8px"
-                  }, children: "Improved Prompt:" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("div", { style: {
-                    background: "rgba(255, 255, 255, 0.08)",
-                    border: "1px solid rgba(255, 255, 255, 0.2)",
-                    borderRadius: "8px",
-                    padding: "12px",
-                    maxHeight: "140px",
-                    overflowY: "auto",
-                    fontSize: "14px",
-                    lineHeight: "1.5",
-                    whiteSpace: "pre-wrap"
-                  }, children: improvedPrompt })
+                  /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
+                    "div",
+                    {
+                      style: {
+                        color: "var(--text-readable)",
+                        fontSize: "14px",
+                        fontWeight: "500",
+                        marginBottom: "8px"
+                      },
+                      children: "Improved Prompt:"
+                    }
+                  ),
+                  /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
+                    "div",
+                    {
+                      style: {
+                        background: "rgba(255, 255, 255, 0.08)",
+                        border: "1px solid rgba(255, 255, 255, 0.2)",
+                        borderRadius: "8px",
+                        padding: "12px",
+                        maxHeight: "140px",
+                        overflowY: "auto",
+                        fontSize: "14px",
+                        lineHeight: "1.5",
+                        whiteSpace: "pre-wrap"
+                      },
+                      children: improvedPrompt
+                    }
+                  )
                 ] }),
                 /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("div", { style: { marginBottom: "12px" }, children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("div", { style: {
-                    color: "var(--text-readable)",
-                    fontSize: "14px",
-                    fontWeight: "500",
-                    marginBottom: "8px"
-                  }, children: "What was improved:" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("div", { style: {
-                    background: "rgba(255, 255, 255, 0.08)",
-                    border: "1px solid rgba(255, 255, 255, 0.2)",
-                    borderRadius: "8px",
-                    padding: "12px",
-                    maxHeight: "120px",
-                    overflowY: "auto",
-                    fontSize: "13px",
-                    lineHeight: "1.5",
-                    whiteSpace: "pre-wrap"
-                  }, children: optimizeResult?.checklist?.join("\n\n") || "Optimization details will appear here." })
+                  /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
+                    "div",
+                    {
+                      style: {
+                        color: "var(--text-readable)",
+                        fontSize: "14px",
+                        fontWeight: "500",
+                        marginBottom: "8px"
+                      },
+                      children: "What was improved:"
+                    }
+                  ),
+                  /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
+                    "div",
+                    {
+                      style: {
+                        background: "rgba(255, 255, 255, 0.08)",
+                        border: "1px solid rgba(255, 255, 255, 0.2)",
+                        borderRadius: "8px",
+                        padding: "12px",
+                        maxHeight: "120px",
+                        overflowY: "auto",
+                        fontSize: "13px",
+                        lineHeight: "1.5",
+                        whiteSpace: "pre-wrap"
+                      },
+                      children: optimizeResult?.checklist?.join("\n\n") || "Optimization details will appear here."
+                    }
+                  )
                 ] }),
                 /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
                   "button",
@@ -24320,7 +24394,6 @@
                       fontSize: "13px",
                       fontWeight: "500",
                       cursor: "pointer",
-                      marginBottom: "8px",
                       transition: "all 0.2s ease"
                     },
                     children: "\u{1F4CB} Copy to Clipboard"
@@ -24345,56 +24418,89 @@
                   }
                 )
               ] }),
-              (isScoring || isOptimizing) && /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("div", { style: {
-                position: "fixed",
-                top: "50%",
-                left: "50%",
-                transform: "translate(-50%, -50%)",
-                background: "rgba(0,0,0,0.9)",
-                borderRadius: "12px",
-                padding: "30px 40px",
-                textAlign: "center",
-                border: "1px solid rgba(255,255,255,0.2)",
-                backdropFilter: "blur(15px)",
-                zIndex: 9999,
-                minWidth: "200px"
-              }, children: [
-                /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("div", { style: {
-                  width: "80px",
-                  height: "80px",
-                  margin: "0 auto 16px",
-                  background: isScoring ? "linear-gradient(45deg, #3b82f6, #1d4ed8)" : "linear-gradient(45deg, #10b981, #059669)",
-                  borderRadius: "50%",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  animation: isScoring ? "spin 2s linear infinite" : "pulse 1.5s ease-in-out infinite"
-                }, children: /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(p, { size: "4", weight: "bold", style: { color: "white" }, children: isScoring ? "\u{1F4CA}" : "\u26A1" }) }),
-                /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(p, { size: "3", weight: "medium", style: { color: "white", marginBottom: "8px", display: "block" }, children: isScoring ? "Analyzing your prompt..." : "Creating your improved prompt..." }),
-                /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(p, { size: "2", style: { color: "#888" }, children: isScoring ? "This might take a few seconds" : "Processing with Gemini AI" })
-              ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("div", { style: { marginTop: "auto", paddingTop: "12px", paddingBottom: "8px" }, children: /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
-                "button",
+              (isScoring || isOptimizing) && /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(
+                "div",
                 {
-                  onClick: openOptions,
                   style: {
-                    width: "100%",
-                    padding: "8px",
-                    background: "rgba(255,255,255,0.08)",
-                    color: "var(--text-secondary)",
-                    border: "1px solid rgba(255,255,255,0.15)",
-                    borderRadius: "6px",
-                    fontSize: "12px",
-                    cursor: "pointer",
-                    transition: "all 0.2s ease",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: "6px"
+                    position: "fixed",
+                    top: "50%",
+                    left: "50%",
+                    transform: "translate(-50%, -50%)",
+                    background: "rgba(0,0,0,0.9)",
+                    borderRadius: "12px",
+                    padding: "30px 40px",
+                    textAlign: "center",
+                    border: "1px solid rgba(255,255,255,0.2)",
+                    backdropFilter: "blur(15px)",
+                    zIndex: 9999,
+                    minWidth: "200px"
                   },
-                  children: "\u2699\uFE0F API Settings"
+                  children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
+                      "div",
+                      {
+                        style: {
+                          width: "80px",
+                          height: "80px",
+                          margin: "0 auto 16px",
+                          background: isScoring ? "linear-gradient(45deg, #3b82f6, #1d4ed8)" : "linear-gradient(45deg, #10b981, #059669)",
+                          borderRadius: "50%",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          animation: isScoring ? "spin 2s linear infinite" : "pulse 1.5s ease-in-out infinite"
+                        },
+                        children: /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(p, { size: "4", weight: "bold", style: { color: "white" }, children: isScoring ? "\u{1F4CA}" : "\u26A1" })
+                      }
+                    ),
+                    /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
+                      p,
+                      {
+                        size: "3",
+                        weight: "medium",
+                        style: {
+                          color: "white",
+                          marginBottom: "8px",
+                          display: "block"
+                        },
+                        children: isScoring ? "Analyzing your prompt..." : "Creating your improved prompt..."
+                      }
+                    ),
+                    /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(p, { size: "2", style: { color: "#888" }, children: isScoring ? "This might take a few seconds" : "Processing with Gemini AI" })
+                  ]
                 }
-              ) })
+              ),
+              /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
+                "div",
+                {
+                  style: {
+                    paddingBottom: "8px"
+                  },
+                  children: /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
+                    "button",
+                    {
+                      onClick: openOptions,
+                      style: {
+                        width: "100%",
+                        padding: "8px",
+                        background: "rgba(255,255,255,0.08)",
+                        color: "var(--text-secondary)",
+                        border: "1px solid rgba(255,255,255,0.15)",
+                        borderRadius: "6px",
+                        fontSize: "12px",
+                        cursor: "pointer",
+                        transition: "all 0.2s ease",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: "6px",
+                        marginBottom: "12px"
+                      },
+                      children: "\u2699\uFE0F API Settings"
+                    }
+                  )
+                }
+              )
             ] })
           ] }) })
         ]

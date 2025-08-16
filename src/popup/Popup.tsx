@@ -1,36 +1,39 @@
-import React, { useState, useEffect } from 'react';
-import { Theme, Button, Flex, Text, Callout } from '@radix-ui/themes';
-import '@radix-ui/themes/styles.css';
-import { Score, Optimize, HistoryEntry } from '../lib/schema';
-import { scorePromptViaBg, optimizePromptViaBg } from '../lib/messages';
-import { 
-  saveWorkingState, 
-  loadWorkingState, 
-  saveHistory, 
+import React, { useState, useEffect } from "react";
+import { Theme, Button, Flex, Text, Callout } from "@radix-ui/themes";
+import "@radix-ui/themes/styles.css";
+import { Score, Optimize, HistoryEntry } from "../lib/schema";
+import { scorePromptViaBg, optimizePromptViaBg } from "../lib/messages";
+import {
+  saveWorkingState,
+  loadWorkingState,
+  saveHistory,
   loadHistory,
-  getKey 
-} from '../lib/storage';
+  getKey,
+} from "../lib/storage";
 
 // Components
-import PromptEditor from './components/PromptEditor';
-import ScorePanel from './components/ScorePanel';
-import ImprovedPanel from './components/ImprovedPanel';
-import HistoryList from './components/HistoryList';
-import Toolbar from './components/Toolbar';
-import LoadingAnimation from './components/LoadingAnimation';
-import Toast from './components/Toast';
+import PromptEditor from "./components/PromptEditor";
+import ScorePanel from "./components/ScorePanel";
+import ImprovedPanel from "./components/ImprovedPanel";
+import HistoryList from "./components/HistoryList";
+import Toolbar from "./components/Toolbar";
+import LoadingAnimation from "./components/LoadingAnimation";
+import Toast from "./components/Toast";
 
 const Popup: React.FC = () => {
-  const [prompt, setPrompt] = useState('');
+  const [prompt, setPrompt] = useState("");
   const [originalScore, setOriginalScore] = useState<Score | undefined>();
-  const [improvedPrompt, setImprovedPrompt] = useState<string>('');
+  const [improvedPrompt, setImprovedPrompt] = useState<string>("");
   const [improvedScore, setImprovedScore] = useState<Score | undefined>();
   const [optimizeResult, setOptimizeResult] = useState<Optimize | undefined>();
   const [history, setHistory] = useState<HistoryEntry[]>([]);
-  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const [toast, setToast] = useState<{
+    message: string;
+    type: "success" | "error";
+  } | null>(null);
   const [apiKeyConfigured, setApiKeyConfigured] = useState(true);
-  const [error, setError] = useState<string>('');
-  
+  const [error, setError] = useState<string>("");
+
   // Loading states
   const [isScoring, setIsScoring] = useState(false);
   const [isOptimizing, setIsOptimizing] = useState(false);
@@ -56,7 +59,7 @@ const Popup: React.FC = () => {
       if (workingState) {
         setPrompt(workingState.prompt);
         setOriginalScore(workingState.currentScore);
-        setImprovedPrompt(workingState.improved || '');
+        setImprovedPrompt(workingState.improved || "");
         setImprovedScore(workingState.improvedScore);
       }
 
@@ -64,29 +67,29 @@ const Popup: React.FC = () => {
       const historyData = await loadHistory();
       setHistory(historyData);
     } catch (error) {
-      console.error('Failed to load initial state:', error);
+      console.error("Failed to load initial state:", error);
     }
   };
 
   const handleScore = async () => {
     if (!prompt.trim()) {
-      setError('Paste a prompt first');
+      setError("Paste a prompt first");
       return;
     }
 
     setIsScoring(true);
-    setError('');
-    
+    setError("");
+
     try {
       const score = await scorePromptViaBg(prompt.trim());
       setOriginalScore(score);
-      
+
       // Save working state
       await saveWorkingState({
         prompt: prompt.trim(),
         currentScore: score,
         improved: improvedPrompt,
-        improvedScore: improvedScore
+        improvedScore: improvedScore,
       });
 
       // Save to history
@@ -95,15 +98,16 @@ const Popup: React.FC = () => {
         originalScore: score,
         improved: improvedPrompt || undefined,
         improvedScore: improvedScore,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
       await saveHistory(entry);
       const updatedHistory = await loadHistory();
       setHistory(updatedHistory);
-
     } catch (error) {
-      console.error('Score error:', error);
-      setError(error instanceof Error ? error.message : 'Failed to score prompt');
+      console.error("Score error:", error);
+      setError(
+        error instanceof Error ? error.message : "Failed to score prompt"
+      );
     } finally {
       setIsScoring(false);
     }
@@ -111,32 +115,32 @@ const Popup: React.FC = () => {
 
   const handleOptimize = async () => {
     if (!prompt.trim()) {
-      setError('Paste a prompt first');
+      setError("Paste a prompt first");
       return;
     }
 
     setIsOptimizing(true);
-    setError('');
-    
+    setError("");
+
     try {
       const result = await optimizePromptViaBg(prompt.trim());
       setOptimizeResult(result);
       setImprovedPrompt(result.improved_prompt);
-      
+
       // Automatically score the improved prompt
       try {
         const newScore = await scorePromptViaBg(result.improved_prompt);
         setImprovedScore(newScore);
       } catch (scoreError) {
-        console.error('Failed to score improved prompt:', scoreError);
+        console.error("Failed to score improved prompt:", scoreError);
       }
-      
+
       // Save working state
       await saveWorkingState({
         prompt: prompt.trim(),
         currentScore: originalScore,
         improved: result.improved_prompt,
-        improvedScore: improvedScore
+        improvedScore: improvedScore,
       });
 
       // Save to history
@@ -145,15 +149,16 @@ const Popup: React.FC = () => {
         originalScore: originalScore,
         improved: result.improved_prompt,
         improvedScore: improvedScore,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
       await saveHistory(entry);
       const updatedHistory = await loadHistory();
       setHistory(updatedHistory);
-
     } catch (error) {
-      console.error('Optimize error:', error);
-      setError(error instanceof Error ? error.message : 'Failed to optimize prompt');
+      console.error("Optimize error:", error);
+      setError(
+        error instanceof Error ? error.message : "Failed to optimize prompt"
+      );
     } finally {
       setIsOptimizing(false);
     }
@@ -162,10 +167,10 @@ const Popup: React.FC = () => {
   const handleCopy = async (text: string, label: string) => {
     try {
       await navigator.clipboard.writeText(text);
-      setToast({ message: `${label} copied!`, type: 'success' });
+      setToast({ message: `${label} copied!`, type: "success" });
     } catch (error) {
-      console.error('Failed to copy:', error);
-      setToast({ message: 'Failed to copy', type: 'error' });
+      console.error("Failed to copy:", error);
+      setToast({ message: "Failed to copy", type: "error" });
     }
   };
 
@@ -174,23 +179,26 @@ const Popup: React.FC = () => {
   };
 
   const handleClear = () => {
-    setPrompt('');
+    setPrompt("");
     setOriginalScore(undefined);
-    setImprovedPrompt('');
+    setImprovedPrompt("");
     setImprovedScore(undefined);
     setOptimizeResult(undefined);
-    setError('');
+    setError("");
   };
 
-  const handleHistoryLoad = (entry: HistoryEntry, which: 'original' | 'improved') => {
-    if (which === 'original') {
+  const handleHistoryLoad = (
+    entry: HistoryEntry,
+    which: "original" | "improved"
+  ) => {
+    if (which === "original") {
       setPrompt(entry.original);
       setOriginalScore(entry.originalScore);
-    } else if (which === 'improved' && entry.improved) {
+    } else if (which === "improved" && entry.improved) {
       setPrompt(entry.improved);
       setOriginalScore(entry.improvedScore);
     }
-    setImprovedPrompt('');
+    setImprovedPrompt("");
     setImprovedScore(undefined);
     setOptimizeResult(undefined);
   };
@@ -518,324 +526,392 @@ const Popup: React.FC = () => {
       `}</style>
       <div className="popup-container">
         <div className="popup-content">
-        {toast && (
-          <Toast 
-            message={toast.message} 
-            type={toast.type} 
-            onClose={() => setToast(null)} 
-          />
-        )}
+          {toast && (
+            <Toast
+              message={toast.message}
+              type={toast.type}
+              onClose={() => setToast(null)}
+            />
+          )}
 
-        <Flex direction="column" gap="4" style={{ height: '100%' }}>
-          {/* Header */}
-          <Flex direction="column" align="center" gap="2" style={{ marginBottom: '16px' }}>
-            <h1 className="header-title">PromptHero</h1>
-            <Text size="2" style={{ color: 'var(--text-secondary)', textAlign: 'center' }}>
-              AI Prompt Optimizer
-            </Text>
-          </Flex>
+          <Flex direction="column" gap="4" style={{ height: "100%" }}>
+            {/* Header */}
+            <Flex
+              direction="column"
+              align="center"
+              gap="2"
+              style={{ marginBottom: "16px" }}
+            >
+              <h1 className="header-title">PromptHero</h1>
+              <Text
+                size="2"
+                style={{ color: "var(--text-secondary)", textAlign: "center" }}
+              >
+                AI Prompt Optimizer
+              </Text>
+            </Flex>
 
-          {/* API Key Warning */}
-          {!apiKeyConfigured && (
-            <div style={{ 
-              background: 'rgba(239, 68, 68, 0.1)', 
-              border: '1px solid rgba(239, 68, 68, 0.3)',
-              borderRadius: '8px',
-              padding: '10px 12px',
-              marginBottom: '12px',
-              fontSize: '13px',
-              color: '#fca5a5',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px'
-            }}>
-              <span>⚠️ API key not configured.</span>
-              <button 
-                onClick={openOptions}
+            {/* API Key Warning */}
+            {!apiKeyConfigured && (
+              <div
                 style={{
-                  background: 'transparent',
-                  border: '1px solid rgba(252, 165, 165, 0.5)',
-                  borderRadius: '4px',
-                  color: '#fca5a5',
-                  padding: '2px 6px',
-                  fontSize: '11px',
-                  cursor: 'pointer'
+                  background: "rgba(239, 68, 68, 0.1)",
+                  border: "1px solid rgba(239, 68, 68, 0.3)",
+                  borderRadius: "8px",
+                  padding: "10px 12px",
+                  marginBottom: "12px",
+                  fontSize: "13px",
+                  color: "#fca5a5",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
                 }}
               >
-                Open Options
+                <span>⚠️ API key not configured.</span>
+                <button
+                  onClick={openOptions}
+                  style={{
+                    background: "transparent",
+                    border: "1px solid rgba(252, 165, 165, 0.5)",
+                    borderRadius: "4px",
+                    color: "#fca5a5",
+                    padding: "2px 6px",
+                    fontSize: "11px",
+                    cursor: "pointer",
+                  }}
+                >
+                  Open Options
+                </button>
+              </div>
+            )}
+
+            {/* Error Display */}
+            {error && (
+              <div
+                style={{
+                  background: "rgba(239, 68, 68, 0.1)",
+                  border: "1px solid rgba(239, 68, 68, 0.3)",
+                  borderRadius: "8px",
+                  padding: "10px 12px",
+                  marginBottom: "12px",
+                  fontSize: "13px",
+                  color: "#fca5a5",
+                }}
+              >
+                ⚠️ {error}
+              </div>
+            )}
+
+            {/* Tab Navigation */}
+            <div className="tab-container">
+              <button
+                className={`tab-button ${
+                  !improvedPrompt ? "active" : "inactive"
+                }`}
+                onClick={() => setImprovedPrompt("")}
+              >
+                📝 Original Prompt
+              </button>
+              <button
+                className={`tab-button ${
+                  improvedPrompt ? "active" : "inactive"
+                }`}
+                disabled={!improvedPrompt}
+              >
+                ⚡ Optimized Result
               </button>
             </div>
-          )}
 
-          {/* Error Display */}
-          {error && (
-            <div style={{ 
-              background: 'rgba(239, 68, 68, 0.1)', 
-              border: '1px solid rgba(239, 68, 68, 0.3)',
-              borderRadius: '8px',
-              padding: '10px 12px',
-              marginBottom: '12px',
-              fontSize: '13px',
-              color: '#fca5a5'
-            }}>
-              ⚠️ {error}
-            </div>
-          )}
-
-          {/* Tab Navigation */}
-          <div className="tab-container">
-            <button 
-              className={`tab-button ${!improvedPrompt ? 'active' : 'inactive'}`}
-              onClick={() => setImprovedPrompt('')}
-            >
-              📝 Original Prompt
-            </button>
-            <button 
-              className={`tab-button ${improvedPrompt ? 'active' : 'inactive'}`}
-              disabled={!improvedPrompt}
-            >
-              ⚡ Optimized Result
-            </button>
-          </div>
-
-          {!improvedPrompt ? (
-            <>
-              {/* Original Prompt Tab */}
-              <div style={{ marginBottom: '12px' }}>
-                <div style={{ 
-                  color: 'var(--text-readable)', 
-                  fontSize: '14px', 
-                  fontWeight: '500', 
-                  marginBottom: '8px' 
-                }}>
-                  Enter your AI prompt:
-                </div>
-                <div style={{
-                  background: 'rgba(255, 255, 255, 0.08)',
-                  border: '1px solid rgba(255, 255, 255, 0.2)',
-                  borderRadius: '8px',
-                  padding: '12px'
-                }}>
-                  <textarea
-                    value={prompt}
-                    onChange={(e) => setPrompt(e.target.value)}
-                    placeholder="Example: Write a story about a robot learning to feel emotions..."
-                    disabled={isLoading}
+            {!improvedPrompt ? (
+              <>
+                {/* Original Prompt Tab */}
+                <div style={{ marginBottom: "12px" }}>
+                  <div
                     style={{
-                      width: '100%',
-                      minHeight: '100px',
-                      background: 'transparent',
-                      border: 'none',
-                      color: 'var(--text-primary)',
-                      fontSize: '14px',
-                      lineHeight: '1.4',
-                      resize: 'vertical',
-                      fontFamily: 'inherit',
-                      outline: 'none',
-                      boxSizing: 'border-box'
+                      color: "var(--text-readable)",
+                      fontSize: "14px",
+                      fontWeight: "500",
+                      marginBottom: "8px",
                     }}
-                  />
+                  >
+                    Enter your AI prompt:
+                  </div>
+                  <div
+                    style={{
+                      background: "rgba(255, 255, 255, 0.08)",
+                      border: "1px solid rgba(255, 255, 255, 0.2)",
+                      borderRadius: "8px",
+                      padding: "12px",
+                    }}
+                  >
+                    <textarea
+                      value={prompt}
+                      onChange={(e) => setPrompt(e.target.value)}
+                      placeholder="Example: Write a story about a robot learning to feel emotions..."
+                      disabled={isLoading}
+                      style={{
+                        width: "100%",
+                        minHeight: "100px",
+                        background: "transparent",
+                        border: "none",
+                        color: "var(--text-primary)",
+                        fontSize: "14px",
+                        lineHeight: "1.4",
+                        resize: "vertical",
+                        fontFamily: "inherit",
+                        outline: "none",
+                        boxSizing: "border-box",
+                      }}
+                    />
+                  </div>
                 </div>
-              </div>
 
-              {/* Action Buttons */}
-              <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
-                <button 
-                  onClick={handleScore}
-                  disabled={!prompt.trim() || isLoading || !apiKeyConfigured}
+                {/* Action Buttons */}
+                <div
+                  style={{ display: "flex", gap: "8px", marginBottom: "12px" }}
+                >
+                  <button
+                    onClick={handleScore}
+                    disabled={!prompt.trim() || isLoading || !apiKeyConfigured}
+                    style={{
+                      flex: 1,
+                      padding: "10px",
+                      background: "linear-gradient(135deg, #3b82f6, #1d4ed8)",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "8px",
+                      fontSize: "13px",
+                      fontWeight: "600",
+                      cursor:
+                        !prompt.trim() || isLoading || !apiKeyConfigured
+                          ? "not-allowed"
+                          : "pointer",
+                      opacity:
+                        !prompt.trim() || isLoading || !apiKeyConfigured
+                          ? 0.5
+                          : 1,
+                      transition: "all 0.2s ease",
+                    }}
+                  >
+                    📊 Score Prompt
+                  </button>
+                  <button
+                    onClick={handleOptimize}
+                    disabled={!prompt.trim() || isLoading || !apiKeyConfigured}
+                    style={{
+                      flex: 1,
+                      padding: "10px",
+                      background: "linear-gradient(135deg, #10b981, #059669)",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "8px",
+                      fontSize: "13px",
+                      fontWeight: "600",
+                      cursor:
+                        !prompt.trim() || isLoading || !apiKeyConfigured
+                          ? "not-allowed"
+                          : "pointer",
+                      opacity:
+                        !prompt.trim() || isLoading || !apiKeyConfigured
+                          ? 0.5
+                          : 1,
+                      transition: "all 0.2s ease",
+                    }}
+                  >
+                    ⚡ Optimize Prompt
+                  </button>
+                </div>
+
+                {/* Score Display */}
+                <ScorePanel title="Prompt Score" score={originalScore} />
+              </>
+            ) : (
+              <>
+                {/* Optimized Result Tab */}
+                <div style={{ marginBottom: "12px" }}>
+                  <div
+                    style={{
+                      color: "var(--text-readable)",
+                      fontSize: "14px",
+                      fontWeight: "500",
+                      marginBottom: "8px",
+                    }}
+                  >
+                    Improved Prompt:
+                  </div>
+                  <div
+                    style={{
+                      background: "rgba(255, 255, 255, 0.08)",
+                      border: "1px solid rgba(255, 255, 255, 0.2)",
+                      borderRadius: "8px",
+                      padding: "12px",
+                      maxHeight: "140px",
+                      overflowY: "auto",
+                      fontSize: "14px",
+                      lineHeight: "1.5",
+                      whiteSpace: "pre-wrap",
+                    }}
+                  >
+                    {improvedPrompt}
+                  </div>
+                </div>
+
+                <div style={{ marginBottom: "12px" }}>
+                  <div
+                    style={{
+                      color: "var(--text-readable)",
+                      fontSize: "14px",
+                      fontWeight: "500",
+                      marginBottom: "8px",
+                    }}
+                  >
+                    What was improved:
+                  </div>
+                  <div
+                    style={{
+                      background: "rgba(255, 255, 255, 0.08)",
+                      border: "1px solid rgba(255, 255, 255, 0.2)",
+                      borderRadius: "8px",
+                      padding: "12px",
+                      maxHeight: "120px",
+                      overflowY: "auto",
+                      fontSize: "13px",
+                      lineHeight: "1.5",
+                      whiteSpace: "pre-wrap",
+                    }}
+                  >
+                    {optimizeResult?.checklist?.join("\n\n") ||
+                      "Optimization details will appear here."}
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => handleCopy(improvedPrompt, "Improved prompt")}
                   style={{
-                    flex: 1,
-                    padding: '10px',
-                    background: 'linear-gradient(135deg, #3b82f6, #1d4ed8)',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '8px',
-                    fontSize: '13px',
-                    fontWeight: '600',
-                    cursor: !prompt.trim() || isLoading || !apiKeyConfigured ? 'not-allowed' : 'pointer',
-                    opacity: !prompt.trim() || isLoading || !apiKeyConfigured ? 0.5 : 1,
-                    transition: 'all 0.2s ease'
+                    width: "100%",
+                    padding: "10px",
+                    background:
+                      "linear-gradient(135deg, var(--primary-purple), var(--secondary-purple))",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "8px",
+                    fontSize: "13px",
+                    fontWeight: "500",
+                    cursor: "pointer",
+                    transition: "all 0.2s ease",
                   }}
                 >
-                  📊 Score Prompt
+                  📋 Copy to Clipboard
                 </button>
-                <button 
-                  onClick={handleOptimize}
-                  disabled={!prompt.trim() || isLoading || !apiKeyConfigured}
+
+                <button
+                  onClick={() => setImprovedPrompt("")}
                   style={{
-                    flex: 1,
-                    padding: '10px',
-                    background: 'linear-gradient(135deg, #10b981, #059669)',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '8px',
-                    fontSize: '13px',
-                    fontWeight: '600',
-                    cursor: !prompt.trim() || isLoading || !apiKeyConfigured ? 'not-allowed' : 'pointer',
-                    opacity: !prompt.trim() || isLoading || !apiKeyConfigured ? 0.5 : 1,
-                    transition: 'all 0.2s ease'
+                    width: "100%",
+                    padding: "10px",
+                    background: "rgba(255, 255, 255, 0.1)",
+                    color: "var(--text-secondary)",
+                    border: "1px solid rgba(255, 255, 255, 0.2)",
+                    borderRadius: "8px",
+                    fontSize: "13px",
+                    cursor: "pointer",
+                    transition: "all 0.2s ease",
                   }}
                 >
-                  ⚡ Optimize Prompt
+                  ← Back to Original
                 </button>
-              </div>
+              </>
+            )}
 
-              {/* Score Display */}
-              <ScorePanel title="Prompt Score" score={originalScore} />
-            </>
-          ) : (
-            <>
-              {/* Optimized Result Tab */}
-              <div style={{ marginBottom: '12px' }}>
-                <div style={{ 
-                  color: 'var(--text-readable)', 
-                  fontSize: '14px', 
-                  fontWeight: '500', 
-                  marginBottom: '8px' 
-                }}>
-                  Improved Prompt:
-                </div>
-                <div style={{
-                  background: 'rgba(255, 255, 255, 0.08)',
-                  border: '1px solid rgba(255, 255, 255, 0.2)',
-                  borderRadius: '8px',
-                  padding: '12px',
-                  maxHeight: '140px',
-                  overflowY: 'auto',
-                  fontSize: '14px',
-                  lineHeight: '1.5',
-                  whiteSpace: 'pre-wrap'
-                }}>
-                  {improvedPrompt}
-                </div>
-              </div>
-
-              <div style={{ marginBottom: '12px' }}>
-                <div style={{ 
-                  color: 'var(--text-readable)', 
-                  fontSize: '14px', 
-                  fontWeight: '500', 
-                  marginBottom: '8px' 
-                }}>
-                  What was improved:
-                </div>
-                <div style={{
-                  background: 'rgba(255, 255, 255, 0.08)',
-                  border: '1px solid rgba(255, 255, 255, 0.2)',
-                  borderRadius: '8px',
-                  padding: '12px',
-                  maxHeight: '120px',
-                  overflowY: 'auto',
-                  fontSize: '13px',
-                  lineHeight: '1.5',
-                  whiteSpace: 'pre-wrap'
-                }}>
-                  {optimizeResult?.checklist?.join('\n\n') || 'Optimization details will appear here.'}
-                </div>
-              </div>
-
-              <button 
-                onClick={() => handleCopy(improvedPrompt, 'Improved prompt')}
+            {/* Loading Animation - Center Overlay */}
+            {(isScoring || isOptimizing) && (
+              <div
                 style={{
-                  width: '100%',
-                  padding: '10px',
-                  background: 'linear-gradient(135deg, var(--primary-purple), var(--secondary-purple))',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '8px',
-                  fontSize: '13px',
-                  fontWeight: '500',
-                  cursor: 'pointer',
-                  marginBottom: '8px',
-                  transition: 'all 0.2s ease'
+                  position: "fixed",
+                  top: "50%",
+                  left: "50%",
+                  transform: "translate(-50%, -50%)",
+                  background: "rgba(0,0,0,0.9)",
+                  borderRadius: "12px",
+                  padding: "30px 40px",
+                  textAlign: "center",
+                  border: "1px solid rgba(255,255,255,0.2)",
+                  backdropFilter: "blur(15px)",
+                  zIndex: 9999,
+                  minWidth: "200px",
                 }}
               >
-                📋 Copy to Clipboard
-              </button>
-
-              <button 
-                onClick={() => setImprovedPrompt('')}
-                style={{
-                  width: '100%',
-                  padding: '10px',
-                  background: 'rgba(255, 255, 255, 0.1)',
-                  color: 'var(--text-secondary)',
-                  border: '1px solid rgba(255, 255, 255, 0.2)',
-                  borderRadius: '8px',
-                  fontSize: '13px',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease'
-                }}
-              >
-                ← Back to Original
-              </button>
-            </>
-          )}
-
-          {/* Loading Animation - Center Overlay */}
-          {(isScoring || isOptimizing) && (
-            <div style={{
-              position: 'fixed',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              background: 'rgba(0,0,0,0.9)',
-              borderRadius: '12px',
-              padding: '30px 40px',
-              textAlign: 'center',
-              border: '1px solid rgba(255,255,255,0.2)',
-              backdropFilter: 'blur(15px)',
-              zIndex: 9999,
-              minWidth: '200px'
-            }}>
-              <div style={{ 
-                width: '80px', 
-                height: '80px', 
-                margin: '0 auto 16px',
-                background: isScoring ? 'linear-gradient(45deg, #3b82f6, #1d4ed8)' : 'linear-gradient(45deg, #10b981, #059669)',
-                borderRadius: '50%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                animation: isScoring ? 'spin 2s linear infinite' : 'pulse 1.5s ease-in-out infinite'
-              }}>
-                <Text size="4" weight="bold" style={{ color: 'white' }}>
-                  {isScoring ? '📊' : '⚡'}
+                <div
+                  style={{
+                    width: "80px",
+                    height: "80px",
+                    margin: "0 auto 16px",
+                    background: isScoring
+                      ? "linear-gradient(45deg, #3b82f6, #1d4ed8)"
+                      : "linear-gradient(45deg, #10b981, #059669)",
+                    borderRadius: "50%",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    animation: isScoring
+                      ? "spin 2s linear infinite"
+                      : "pulse 1.5s ease-in-out infinite",
+                  }}
+                >
+                  <Text size="4" weight="bold" style={{ color: "white" }}>
+                    {isScoring ? "📊" : "⚡"}
+                  </Text>
+                </div>
+                <Text
+                  size="3"
+                  weight="medium"
+                  style={{
+                    color: "white",
+                    marginBottom: "8px",
+                    display: "block",
+                  }}
+                >
+                  {isScoring
+                    ? "Analyzing your prompt..."
+                    : "Creating your improved prompt..."}
+                </Text>
+                <Text size="2" style={{ color: "#888" }}>
+                  {isScoring
+                    ? "This might take a few seconds"
+                    : "Processing with Gemini AI"}
                 </Text>
               </div>
-              <Text size="3" weight="medium" style={{ color: 'white', marginBottom: '8px', display: 'block' }}>
-                {isScoring ? 'Analyzing your prompt...' : 'Creating your improved prompt...'}
-              </Text>
-              <Text size="2" style={{ color: '#888' }}>
-                {isScoring ? 'This might take a few seconds' : 'Processing with Gemini AI'}
-              </Text>
-            </div>
-          )}
+            )}
 
-          {/* Settings Access */}
-          <div style={{ marginTop: 'auto', paddingTop: '12px', paddingBottom: '8px' }}>
-            <button 
-              onClick={openOptions}
+            {/* Settings Access */}
+            <div
               style={{
-                width: '100%',
-                padding: '8px',
-                background: 'rgba(255,255,255,0.08)',
-                color: 'var(--text-secondary)',
-                border: '1px solid rgba(255,255,255,0.15)',
-                borderRadius: '6px',
-                fontSize: '12px',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '6px'
+                paddingBottom: "8px",
               }}
             >
-              ⚙️ API Settings
-            </button>
-          </div>
-        </Flex>
+              <button
+                onClick={openOptions}
+                style={{
+                  width: "100%",
+                  padding: "8px",
+                  background: "rgba(255,255,255,0.08)",
+                  color: "var(--text-secondary)",
+                  border: "1px solid rgba(255,255,255,0.15)",
+                  borderRadius: "6px",
+                  fontSize: "12px",
+                  cursor: "pointer",
+                  transition: "all 0.2s ease",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "6px",
+                  marginBottom: "12px",
+                }}
+              >
+                ⚙️ API Settings
+              </button>
+            </div>
+          </Flex>
         </div>
       </div>
     </Theme>
