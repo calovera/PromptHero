@@ -150,7 +150,138 @@
         </div>
         
         <div class="extension-mockup">
-            <iframe src="./dist/popup/index.html" class="extension-frame"></iframe>
+            <div style="
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+                padding: 16px;
+                overflow-y: auto;
+                scrollbar-width: thin;
+                scrollbar-color: rgba(255,255,255,0.3) transparent;
+            ">
+                <!-- Header -->
+                <div style="text-align: center; margin-bottom: 24px;">
+                    <h1 style="
+                        background: linear-gradient(135deg, #06b6d4, #6366f1, #ec4899);
+                        -webkit-background-clip: text;
+                        -webkit-text-fill-color: transparent;
+                        background-clip: text;
+                        font-weight: 700;
+                        font-size: 24px;
+                        margin-bottom: 6px;
+                        letter-spacing: -0.5px;
+                    ">PromptHero</h1>
+                    <p style="color: #cbd5e1; font-size: 14px; margin: 0;">AI Prompt Optimizer</p>
+                </div>
+
+                <!-- Tab Navigation -->
+                <div style="display: flex; margin-bottom: 16px;">
+                    <button style="
+                        flex: 1;
+                        padding: 8px 16px;
+                        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+                        color: white;
+                        border: none;
+                        border-radius: 8px 0 0 8px;
+                        font-size: 14px;
+                        cursor: pointer;
+                    ">📝 Original Prompt</button>
+                    <button style="
+                        flex: 1;
+                        padding: 8px 16px;
+                        background: rgba(255,255,255,0.1);
+                        color: #94a3b8;
+                        border: none;
+                        border-radius: 0 8px 8px 0;
+                        font-size: 14px;
+                        cursor: not-allowed;
+                    ">⚡ Optimized Result</button>
+                </div>
+
+                <!-- Prompt Input -->
+                <div style="
+                    background: rgba(255, 255, 255, 0.15);
+                    border: 1px solid rgba(255, 255, 255, 0.25);
+                    border-radius: 8px;
+                    backdrop-filter: blur(15px);
+                    padding: 16px;
+                    margin-bottom: 16px;
+                ">
+                    <p style="color: #e2e8f0; font-size: 14px; margin-bottom: 8px; font-weight: 500;">
+                        Enter your AI prompt:
+                    </p>
+                    <textarea style="
+                        width: 100%;
+                        min-height: 100px;
+                        padding: 12px;
+                        background: rgba(255,255,255,0.2);
+                        border: 1px solid rgba(255,255,255,0.3);
+                        border-radius: 6px;
+                        color: #f8fafc;
+                        font-size: 14px;
+                        line-height: 1.5;
+                        resize: vertical;
+                        font-family: inherit;
+                        box-sizing: border-box;
+                    " placeholder="Example: Write a story about a robot..."></textarea>
+                </div>
+
+                <!-- Action Buttons -->
+                <div style="display: flex; gap: 12px; margin-bottom: 16px;">
+                    <button style="
+                        flex: 1;
+                        padding: 12px;
+                        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+                        color: white;
+                        border: none;
+                        border-radius: 6px;
+                        font-size: 14px;
+                        cursor: pointer;
+                        font-weight: 500;
+                    ">📊 Score Prompt</button>
+                    <button style="
+                        flex: 1;
+                        padding: 12px;
+                        background: linear-gradient(135deg, #10b981, #059669);
+                        color: white;
+                        border: none;
+                        border-radius: 6px;
+                        font-size: 14px;
+                        cursor: pointer;
+                        font-weight: 500;
+                    ">⚡ Optimize Prompt</button>
+                </div>
+
+                <!-- Score Panel -->
+                <div style="
+                    background: rgba(255, 255, 255, 0.15);
+                    border: 1px solid rgba(255, 255, 255, 0.25);
+                    border-radius: 8px;
+                    backdrop-filter: blur(15px);
+                    padding: 16px;
+                    margin-bottom: 16px;
+                ">
+                    <p style="color: #e2e8f0; font-size: 14px; margin-bottom: 8px; font-weight: 500;">
+                        Prompt Score
+                    </p>
+                    <p style="color: #94a3b8; font-size: 13px; margin: 0;">
+                        Enter a prompt and click "Score Prompt" to get your rating
+                    </p>
+                </div>
+
+                <!-- Settings Button -->
+                <div style="text-align: center; margin-top: auto; padding-top: 16px;">
+                    <button style="
+                        padding: 8px 16px;
+                        background: rgba(255,255,255,0.1);
+                        color: #cbd5e1;
+                        border: none;
+                        border-radius: 6px;
+                        font-size: 12px;
+                        cursor: pointer;
+                    ">⚙️ API Settings</button>
+                </div>
+            </div>
         </div>
         
         <div class="instructions">
