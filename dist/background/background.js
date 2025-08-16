@@ -1,6 +1,4 @@
-// Bundled background script for PromptHero
-
-// Simple validation functions (no external dependencies)
+// Simple validation functions
 function validateScore(data) {
   if (typeof data !== "object" || data === null) return false;
   if (typeof data.score !== "number" || data.score < 0 || data.score > 100)
@@ -110,7 +108,6 @@ async function callJson(system, user, validator, opts) {
     }
     return parsed;
   } catch (error) {
-    // Retry once with stricter instruction
     const retrySystem = system + " Return VALID JSON only. No prose.";
     text = await callGemini(retrySystem, user, opts);
     const parsed = JSON.parse(text);
@@ -178,6 +175,5 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       });
     }
   })();
-  // Return true to keep async channel open
   return true;
 });

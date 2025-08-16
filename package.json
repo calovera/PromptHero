@@ -4,8 +4,9 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "build": "node build-simple.js",
-    "build:dev": "node build-simple.js",
+    "build": "node build-esbuild.js",
+    "build:dev": "node build-esbuild.js",
+    "build:simple": "node build-simple.js",
     "build:vite": "node build.js",
     "setup": "node setup-env.js",
     "setup:dev": "node setup-dev.js",
@@ -34,5 +35,8 @@
     "typescript": "^5.9.2",
     "vite": "^7.1.1",
     "zod": "^4.0.16"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.9"
   }
 }
