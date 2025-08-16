@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PromptHero Chrome Extension Preview</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
+        :root {
+            --primary-purple: #6366f1;
+            --secondary-purple: #8b5cf6;
+            --accent-pink: #ec4899;
+            --accent-cyan: #06b6d4;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-readable: #e2e8f0;
+            --text-muted: #94a3b8;
+            --background-primary: #0f172a;
+            --background-secondary: #1e293b;
+        }
+        
+        body {
+            margin: 0;
+            padding: 40px;
+            background: linear-gradient(135deg, var(--background-primary) 0%, var(--background-secondary) 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .preview-container {
+            max-width: 1200px;
+            width: 100%;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--primary-purple), var(--accent-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+            font-size: 48px;
+            margin-bottom: 16px;
+            letter-spacing: -1px;
+        }
+        
+        .header p {
+            color: var(--text-secondary);
+            font-size: 18px;
+            margin-bottom: 32px;
+        }
+        
+        .extension-mockup {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 16px;
+            backdrop-filter: blur(15px);
+            padding: 0;
+            width: 400px;
+            height: 600px;
+            margin: 0 auto 40px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .instructions {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 24px;
+            margin-top: 32px;
+        }
+        
+        .instructions h3 {
+            color: var(--text-primary);
+            margin-top: 0;
+            margin-bottom: 16px;
+        }
+        
+        .instructions ol {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+        
+        .instructions li {
+            margin-bottom: 8px;
+        }
+        
+        .code {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            padding: 4px 8px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 14px;
+            color: var(--accent-cyan);
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-top: 40px;
+        }
+        
+        .feature {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+        }
+        
+        .feature h4 {
+            color: var(--text-primary);
+            margin-top: 0;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .feature p {
+            color: var(--text-secondary);
+            margin: 0;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="preview-container">
+        <div class="header">
+            <h1>PromptHero</h1>
+            <p>Chrome Extension for AI Prompt Optimization</p>
+        </div>
+        
+        <div class="extension-mockup">
+            <div style="
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+                padding: 16px;
+                overflow-y: auto;
+                scrollbar-width: thin;
+                scrollbar-color: rgba(255,255,255,0.3) transparent;
+            ">
+                <!-- Header -->
+                <div style="text-align: center; margin-bottom: 24px;">
+                    <h1 style="
+                        background: linear-gradient(135deg, #06b6d4, #6366f1, #ec4899);
+                        -webkit-background-clip: text;
+                        -webkit-text-fill-color: transparent;
+                        background-clip: text;
+                        font-weight: 700;
+                        font-size: 24px;
+                        margin-bottom: 6px;
+                        letter-spacing: -0.5px;
+                    ">PromptHero</h1>
+                    <p style="color: #cbd5e1; font-size: 14px; margin: 0;">AI Prompt Optimizer</p>
+                </div>
+
+                <!-- Tab Navigation -->
+                <div style="display: flex; margin-bottom: 16px;">
+                    <button style="
+                        flex: 1;
+                        padding: 8px 16px;
+                        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+                        color: white;
+                        border: none;
+                        border-radius: 8px 0 0 8px;
+                        font-size: 14px;
+                        cursor: pointer;
+                    ">📝 Original Prompt</button>
+                    <button style="
+                        flex: 1;
+                        padding: 8px 16px;
+                        background: rgba(255,255,255,0.1);
+                        color: #94a3b8;
+                        border: none;
+                        border-radius: 0 8px 8px 0;
+                        font-size: 14px;
+                        cursor: not-allowed;
+                    ">⚡ Optimized Result</button>
+                </div>
+
+                <!-- Prompt Input -->
+                <div style="
+                    background: rgba(255, 255, 255, 0.15);
+                    border: 1px solid rgba(255, 255, 255, 0.25);
+                    border-radius: 8px;
+                    backdrop-filter: blur(15px);
+                    padding: 16px;
+                    margin-bottom: 16px;
+                ">
+                    <p style="color: #e2e8f0; font-size: 14px; margin-bottom: 8px; font-weight: 500;">
+                        Enter your AI prompt:
+                    </p>
+                    <textarea style="
+                        width: 100%;
+                        min-height: 100px;
+                        padding: 12px;
+                        background: rgba(255,255,255,0.2);
+                        border: 1px solid rgba(255,255,255,0.3);
+                        border-radius: 6px;
+                        color: #f8fafc;
+                        font-size: 14px;
+                        line-height: 1.5;
+                        resize: vertical;
+                        font-family: inherit;
+                        box-sizing: border-box;
+                    " placeholder="Example: Write a story about a robot..."></textarea>
+                </div>
+
+                <!-- Action Buttons -->
+                <div style="display: flex; gap: 12px; margin-bottom: 16px;">
+                    <button style="
+                        flex: 1;
+                        padding: 12px;
+                        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+                        color: white;
+                        border: none;
+                        border-radius: 6px;
+                        font-size: 14px;
+                        cursor: pointer;
+                        font-weight: 500;
+                    ">📊 Score Prompt</button>
+                    <button style="
+                        flex: 1;
+                        padding: 12px;
+                        background: linear-gradient(135deg, #10b981, #059669);
+                        color: white;
+                        border: none;
+                        border-radius: 6px;
+                        font-size: 14px;
+                        cursor: pointer;
+                        font-weight: 500;
+                    ">⚡ Optimize Prompt</button>
+                </div>
+
+                <!-- Score Panel -->
+                <div style="
+                    background: rgba(255, 255, 255, 0.15);
+                    border: 1px solid rgba(255, 255, 255, 0.25);
+                    border-radius: 8px;
+                    backdrop-filter: blur(15px);
+                    padding: 16px;
+                    margin-bottom: 16px;
+                ">
+                    <p style="color: #e2e8f0; font-size: 14px; margin-bottom: 8px; font-weight: 500;">
+                        Prompt Score
+                    </p>
+                    <p style="color: #94a3b8; font-size: 13px; margin: 0;">
+                        Enter a prompt and click "Score Prompt" to get your rating
+                    </p>
+                </div>
+
+                <!-- Settings Button -->
+                <div style="text-align: center; margin-top: auto; padding-top: 16px;">
+                    <button style="
+                        padding: 8px 16px;
+                        background: rgba(255,255,255,0.1);
+                        color: #cbd5e1;
+                        border: none;
+                        border-radius: 6px;
+                        font-size: 12px;
+                        cursor: pointer;
+                    ">⚙️ API Settings</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <h3>🚀 Installation Instructions</h3>
+            <ol>
+                <li>Open Chrome and navigate to <span class="code">chrome://extensions/</span></li>
+                <li>Enable "Developer mode" using the toggle in the top right</li>
+                <li>Click "Load unpacked" button</li>
+                <li>Select the <span class="code">./dist/</span> folder from this project</li>
+                <li>The PromptHero extension will appear in your Chrome toolbar</li>
+            </ol>
+        </div>
+        
+        <div class="features">
+            <div class="feature">
+                <h4>⚡ AI-Powered Optimization</h4>
+                <p>Uses Google's Gemini AI to analyze and improve your prompts with detailed feedback and scoring.</p>
+            </div>
+            <div class="feature">
+                <h4>📊 Real-time Scoring</h4>
+                <p>Get instant 1-10 ratings for your prompts with specific improvement suggestions.</p>
+            </div>
+            <div class="feature">
+                <h4>🎨 Beautiful Interface</h4>
+                <p>Modern purple/navy gradient theme with glassmorphic design and smooth animations.</p>
+            </div>
+            <div class="feature">
+                <h4>📱 Tab Navigation</h4>
+                <p>Switch between original prompt and optimized result with intuitive tab interface.</p>
+            </div>
+            <div class="feature">
+                <h4>💾 History Tracking</h4>
+                <p>Chrome sync storage keeps your prompt history across devices automatically.</p>
+            </div>
+            <div class="feature">
+                <h4>🔒 Privacy First</h4>
+                <p>All data stays local - API keys and prompts never leave your browser.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
