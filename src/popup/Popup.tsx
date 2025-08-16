@@ -204,12 +204,35 @@ const Popup: React.FC = () => {
   return (
     <Theme
       appearance="dark"
-      accentColor="blue"
+      accentColor="violet"
       grayColor="slate"
       radius="medium"
       scaling="95%"
     >
       <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
+        :root {
+            --primary-purple: #6366f1;
+            --secondary-purple: #8b5cf6;
+            --accent-pink: #ec4899;
+            --accent-cyan: #06b6d4;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-readable: #e2e8f0;
+            --text-muted: #94a3b8;
+            --background-primary: #0f172a;
+            --background-secondary: #1e293b;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--background-primary) 0%, var(--background-secondary) 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
+        }
+        
         @keyframes spin {
           from { transform: rotate(0deg); }
           to { transform: rotate(360deg); }
@@ -218,8 +241,63 @@ const Popup: React.FC = () => {
           0%, 100% { transform: scale(1); }
           50% { transform: scale(1.1); }
         }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .popup-container {
+          width: 400px;
+          height: 600px;
+          background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+          padding: 0;
+          margin: 0;
+          overflow: hidden;
+          position: relative;
+        }
+        
+        .popup-content {
+          padding: 16px;
+          height: 100%;
+          overflow-y: auto;
+          scrollbar-width: thin;
+          scrollbar-color: rgba(255,255,255,0.3) transparent;
+        }
+        
+        .popup-content::-webkit-scrollbar {
+          width: 6px;
+        }
+        
+        .popup-content::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        
+        .popup-content::-webkit-scrollbar-thumb {
+          background: rgba(255,255,255,0.3);
+          border-radius: 3px;
+        }
+        
+        .header-title {
+          background: linear-gradient(135deg, var(--accent-cyan), var(--primary-purple), var(--accent-pink));
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          font-weight: 700;
+          font-size: 24px;
+          margin-bottom: 6px;
+          text-align: center;
+          letter-spacing: -0.5px;
+        }
+        
+        .glassmorphic {
+          background: rgba(255, 255, 255, 0.15);
+          border: 1px solid rgba(255, 255, 255, 0.25);
+          border-radius: 8px;
+          backdrop-filter: blur(15px);
+        }
       `}</style>
-      <div style={{ width: '400px', height: '600px', padding: '16px', overflow: 'auto', position: 'relative' }}>
+      <div className="popup-container">
+        <div className="popup-content">
         {toast && (
           <Toast 
             message={toast.message} 
@@ -230,164 +308,215 @@ const Popup: React.FC = () => {
 
         <Flex direction="column" gap="4" style={{ height: '100%' }}>
           {/* Header */}
-          <Flex justify="between" align="center">
-            <Text size="5" weight="bold">Prompt Optimizer</Text>
-            <Button size="1" variant="ghost" onClick={openOptions}>
-              Open Options
-            </Button>
+          <Flex direction="column" align="center" gap="2" style={{ marginBottom: '16px' }}>
+            <h1 className="header-title">PromptHero</h1>
+            <Text size="2" style={{ color: 'var(--text-secondary)', textAlign: 'center' }}>
+              AI Prompt Optimizer
+            </Text>
           </Flex>
 
           {/* API Key Warning */}
           {!apiKeyConfigured && (
-            <Callout.Root color="red">
-              <Callout.Text>
-                API key not configured.{' '}
-                <Button variant="ghost" size="1" onClick={openOptions}>
+            <div className="glassmorphic" style={{ padding: '12px', marginBottom: '12px', background: 'rgba(239, 68, 68, 0.15)', borderColor: 'rgba(239, 68, 68, 0.3)' }}>
+              <Text size="2" style={{ color: '#fca5a5' }}>
+                ⚠️ API key not configured.{' '}
+                <Button variant="ghost" size="1" onClick={openOptions} style={{ color: '#fca5a5' }}>
                   Open Options
                 </Button>
-              </Callout.Text>
-            </Callout.Root>
-          )}
-
-          {/* Error Display */}
-          {error && (
-            <Callout.Root color="red">
-              <Callout.Text>{error}</Callout.Text>
-            </Callout.Root>
-          )}
-
-          {/* Prompt Editor */}
-          <PromptEditor
-            value={prompt}
-            onChange={setPrompt}
-            onClear={handleClear}
-            onPresetSelect={handlePresetSelect}
-            disabled={isLoading}
-          />
-
-          {/* Toolbar */}
-          <Toolbar
-            onScore={handleScore}
-            onOptimize={handleOptimize}
-            onCopyOriginal={() => handleCopy(prompt, 'Original prompt')}
-            onCopyImproved={() => handleCopy(improvedPrompt, 'Improved prompt')}
-            disabled={{
-              score: !prompt.trim() || isLoading || !apiKeyConfigured,
-              optimize: !prompt.trim() || isLoading || !apiKeyConfigured,
-              copyOriginal: !prompt.trim(),
-              copyImproved: !improvedPrompt
-            }}
-            loading={{
-              scoring: isScoring,
-              optimizing: isOptimizing
-            }}
-          />
-
-          {/* Loading Animation - Center Overlay */}
-          {(isScoring || isOptimizing) && (
-            <div style={{
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              background: 'var(--gray-1)',
-              borderRadius: '16px',
-              padding: '32px',
-              textAlign: 'center',
-              border: '2px solid var(--blue-6)',
-              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
-              zIndex: 1000,
-              minWidth: '200px'
-            }}>
-              {isScoring && (
-                <>
-                  <div style={{ 
-                    width: '80px', 
-                    height: '80px', 
-                    margin: '0 auto 16px',
-                    background: 'linear-gradient(45deg, #3b82f6, #1d4ed8)',
-                    borderRadius: '50%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    animation: 'spin 2s linear infinite'
-                  }}>
-                    <div style={{
-                      width: '50px',
-                      height: '50px',
-                      background: 'var(--gray-1)',
-                      borderRadius: '50%',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center'
-                    }}>
-                      <Text size="4" weight="bold" style={{ color: 'var(--blue-11)' }}>📊</Text>
-                    </div>
-                  </div>
-                  <Text size="3" weight="medium" style={{ color: 'var(--gray-12)', marginBottom: '8px', display: 'block' }}>
-                    Analyzing your prompt...
-                  </Text>
-                </>
-              )}
-              
-              {isOptimizing && (
-                <>
-                  <div style={{ 
-                    width: '80px', 
-                    height: '80px', 
-                    margin: '0 auto 16px',
-                    background: 'linear-gradient(45deg, #10b981, #059669)',
-                    borderRadius: '50%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    animation: 'pulse 1.5s ease-in-out infinite'
-                  }}>
-                    <div style={{
-                      width: '50px',
-                      height: '50px',
-                      background: 'var(--gray-1)',
-                      borderRadius: '50%',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center'
-                    }}>
-                      <Text size="4" weight="bold" style={{ color: 'var(--green-11)' }}>⚡</Text>
-                    </div>
-                  </div>
-                  <Text size="3" weight="medium" style={{ color: 'var(--gray-12)', marginBottom: '8px', display: 'block' }}>
-                    Creating your improved prompt...
-                  </Text>
-                </>
-              )}
-              
-              <Text size="2" style={{ color: 'var(--gray-11)' }}>
-                This might take a few seconds
               </Text>
             </div>
           )}
 
-          {/* Score Panels */}
-          <ScorePanel title="Current score" score={originalScore} />
-          
-          {/* Improved Panel */}
-          <ImprovedPanel
-            improved={improvedPrompt}
-            checklist={optimizeResult?.checklist}
-            onCopy={(text) => handleCopy(text, 'Improved prompt')}
-          />
-          
-          {/* New Score Panel */}
-          {improvedPrompt && (
-            <ScorePanel title="New score" score={improvedScore} />
+          {/* Error Display */}
+          {error && (
+            <div className="glassmorphic" style={{ padding: '12px', marginBottom: '12px', background: 'rgba(239, 68, 68, 0.15)', borderColor: 'rgba(239, 68, 68, 0.3)' }}>
+              <Text size="2" style={{ color: '#fca5a5' }}>
+                ⚠️ {error}
+              </Text>
+            </div>
           )}
 
-          {/* History */}
-          <HistoryList
-            entries={history}
-            onLoad={handleHistoryLoad}
-          />
+          {/* Tab Navigation */}
+          <div style={{ display: 'flex', marginBottom: '16px' }}>
+            <Button 
+              variant={!improvedPrompt ? "solid" : "soft"} 
+              size="2" 
+              style={{ 
+                flex: 1, 
+                borderRadius: '8px 0 0 8px',
+                background: !improvedPrompt ? 'linear-gradient(135deg, var(--primary-purple), var(--secondary-purple))' : 'rgba(255,255,255,0.1)'
+              }}
+              onClick={() => setImprovedPrompt('')}
+            >
+              📝 Original Prompt
+            </Button>
+            <Button 
+              variant={improvedPrompt ? "solid" : "soft"} 
+              size="2" 
+              style={{ 
+                flex: 1, 
+                borderRadius: '0 8px 8px 0',
+                background: improvedPrompt ? 'linear-gradient(135deg, var(--primary-purple), var(--secondary-purple))' : 'rgba(255,255,255,0.1)'
+              }}
+              disabled={!improvedPrompt}
+            >
+              ⚡ Optimized Result
+            </Button>
+          </div>
+
+          {!improvedPrompt ? (
+            <>
+              {/* Original Prompt Tab */}
+              <div className="glassmorphic" style={{ padding: '16px', marginBottom: '16px' }}>
+                <Text size="2" weight="medium" style={{ marginBottom: '8px', display: 'block' }}>
+                  Enter your AI prompt:
+                </Text>
+                <textarea
+                  value={prompt}
+                  onChange={(e) => setPrompt(e.target.value)}
+                  placeholder="Example: Write a story about a robot..."
+                  style={{
+                    width: '100%',
+                    minHeight: '100px',
+                    padding: '12px',
+                    background: 'rgba(255,255,255,0.2)',
+                    border: '1px solid rgba(255,255,255,0.3)',
+                    borderRadius: '6px',
+                    color: 'var(--text-primary)',
+                    fontSize: '14px',
+                    lineHeight: '1.5',
+                    resize: 'vertical',
+                    fontFamily: 'inherit'
+                  }}
+                  disabled={isLoading}
+                />
+              </div>
+
+              {/* Action Buttons */}
+              <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
+                <Button 
+                  onClick={handleScore}
+                  disabled={!prompt.trim() || isLoading || !apiKeyConfigured}
+                  style={{ 
+                    flex: 1,
+                    background: 'linear-gradient(135deg, #3b82f6, #1d4ed8)',
+                    color: 'white'
+                  }}
+                >
+                  📊 Score Prompt
+                </Button>
+                <Button 
+                  onClick={handleOptimize}
+                  disabled={!prompt.trim() || isLoading || !apiKeyConfigured}
+                  style={{ 
+                    flex: 1,
+                    background: 'linear-gradient(135deg, #10b981, #059669)',
+                    color: 'white'
+                  }}
+                >
+                  ⚡ Optimize Prompt
+                </Button>
+              </div>
+
+              {/* Score Display */}
+              <ScorePanel title="Prompt Score" score={originalScore} />
+            </>
+          ) : (
+            <>
+              {/* Optimized Result Tab */}
+              <div style={{ marginBottom: '16px' }}>
+                <Text size="3" weight="medium" style={{ marginBottom: '8px', display: 'block' }}>
+                  Improved Prompt:
+                </Text>
+                <div className="glassmorphic" style={{ 
+                  padding: '16px', 
+                  maxHeight: '200px', 
+                  overflowY: 'auto',
+                  marginBottom: '16px'
+                }}>
+                  <Text size="2" style={{ whiteSpace: 'pre-wrap', lineHeight: 1.5 }}>
+                    {improvedPrompt}
+                  </Text>
+                </div>
+              </div>
+
+              <div style={{ marginBottom: '16px' }}>
+                <Text size="3" weight="medium" style={{ marginBottom: '8px', display: 'block' }}>
+                  What was improved:
+                </Text>
+                <div className="glassmorphic" style={{ 
+                  padding: '16px', 
+                  maxHeight: '200px', 
+                  overflowY: 'auto'
+                }}>
+                  <Text size="2" style={{ whiteSpace: 'pre-wrap', lineHeight: 1.5 }}>
+                    {optimizeResult?.checklist?.join('\n') || 'Optimization details will appear here.'}
+                  </Text>
+                </div>
+              </div>
+
+              <Button 
+                onClick={() => handleCopy(improvedPrompt, 'Improved prompt')}
+                style={{ 
+                  width: '100%',
+                  background: 'linear-gradient(135deg, var(--primary-purple), var(--secondary-purple))',
+                  marginBottom: '12px'
+                }}
+              >
+                📋 Copy to Clipboard
+              </Button>
+
+              <Button 
+                variant="soft"
+                onClick={() => setImprovedPrompt('')}
+                style={{ width: '100%' }}
+              >
+                ← Back to Original
+              </Button>
+            </>
+          )}
+
+          {/* Loading Animation - Center Overlay */}
+          {(isScoring || isOptimizing) && (
+            <div style={{
+              position: 'fixed',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              background: 'rgba(0,0,0,0.9)',
+              borderRadius: '12px',
+              padding: '30px 40px',
+              textAlign: 'center',
+              border: '1px solid rgba(255,255,255,0.2)',
+              backdropFilter: 'blur(15px)',
+              zIndex: 9999,
+              minWidth: '200px'
+            }}>
+              <div style={{ 
+                width: '80px', 
+                height: '80px', 
+                margin: '0 auto 16px',
+                background: isScoring ? 'linear-gradient(45deg, #3b82f6, #1d4ed8)' : 'linear-gradient(45deg, #10b981, #059669)',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                animation: isScoring ? 'spin 2s linear infinite' : 'pulse 1.5s ease-in-out infinite'
+              }}>
+                <Text size="4" weight="bold" style={{ color: 'white' }}>
+                  {isScoring ? '📊' : '⚡'}
+                </Text>
+              </div>
+              <Text size="3" weight="medium" style={{ color: 'white', marginBottom: '8px', display: 'block' }}>
+                {isScoring ? 'Analyzing your prompt...' : 'Creating your improved prompt...'}
+              </Text>
+              <Text size="2" style={{ color: '#888' }}>
+                {isScoring ? 'This might take a few seconds' : 'Processing with Gemini AI'}
+              </Text>
+            </div>
+          )}
         </Flex>
+        </div>
       </div>
     </Theme>
   );
