@@ -858,7 +858,7 @@ const Popup: React.FC = () => {
                       : "pulse 1.5s ease-in-out infinite",
                   }}
                 >
-                  <Text size="4" weight="bold" style={{ color: "white" }}>
+                  <Text size="8" weight="bold" style={{ color: "white" }}>
                     {isScoring ? "📊" : "⚡"}
                   </Text>
                 </div>

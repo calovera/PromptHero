@@ -12,7 +12,7 @@ ${template}
 Return JSON only.`;
 
 const OPTIMIZER_SYSTEM =
-  "You are a prompt engineer. Rewrite the prompt to maximize task success while keeping the same goal. If the prompt is vague or brief, infer reasonable defaults and add missing context requests and constraints. Add clear step-by-step instructions. Specify the desired output format. Keep it concise and token-efficient. Return JSON only that passes: { improved_prompt: string, checklist: string[] }. Checklist lists what you improved. No extra text.";
+  "You are a prompt engineer. Rewrite the prompt to maximize task success while keeping the same goal. If the prompt is vague or brief, infer reasonable defaults and add missing context requests and constraints. Add clear step-by-step instructions. Keep it concise and token-efficient. Do NOT add any JSON format instructions or output format specifications to the improved prompt. Return JSON only that passes: { improved_prompt: string, checklist: string[] }. Checklist lists what you improved. No extra text.";
 
 const OPTIMIZER_USER = (template: string) =>
   `Rewrite this prompt.

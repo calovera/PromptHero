@@ -24450,7 +24450,7 @@
                           justifyContent: "center",
                           animation: isScoring ? "spin 2s linear infinite" : "pulse 1.5s ease-in-out infinite"
                         },
-                        children: /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(p, { size: "4", weight: "bold", style: { color: "white" }, children: isScoring ? "\u{1F4CA}" : "\u26A1" })
+                        children: /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(p, { size: "8", weight: "bold", style: { color: "white" }, children: isScoring ? "\u{1F4CA}" : "\u26A1" })
                       }
                     ),
                     /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
