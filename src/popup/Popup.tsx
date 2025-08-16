@@ -34,6 +34,9 @@ const Popup: React.FC = () => {
   const [apiKeyConfigured, setApiKeyConfigured] = useState(true);
   const [error, setError] = useState<string>("");
 
+  // Navigation state - separate from data state
+  const [activeTab, setActiveTab] = useState<"original" | "optimized">("original");
+
   // Loading states
   const [isScoring, setIsScoring] = useState(false);
   const [isOptimizing, setIsOptimizing] = useState(false);
@@ -135,6 +138,9 @@ const Popup: React.FC = () => {
         console.error("Failed to score improved prompt:", scoreError);
       }
 
+      // Automatically switch to optimized tab after successful optimization
+      setActiveTab("optimized");
+
       // Save working state
       await saveWorkingState({
         prompt: prompt.trim(),
@@ -185,6 +191,7 @@ const Popup: React.FC = () => {
     setImprovedScore(undefined);
     setOptimizeResult(undefined);
     setError("");
+    setActiveTab("original"); // Reset to original tab when clearing
   };
 
   const handleHistoryLoad = (
@@ -194,9 +201,11 @@ const Popup: React.FC = () => {
     if (which === "original") {
       setPrompt(entry.original);
       setOriginalScore(entry.originalScore);
+      setActiveTab("original");
     } else if (which === "improved" && entry.improved) {
       setPrompt(entry.improved);
       setOriginalScore(entry.improvedScore);
+      setActiveTab("original");
     }
     setImprovedPrompt("");
     setImprovedScore(undefined);
@@ -606,23 +615,24 @@ const Popup: React.FC = () => {
             <div className="tab-container">
               <button
                 className={`tab-button ${
-                  !improvedPrompt ? "active" : "inactive"
+                  activeTab === "original" ? "active" : "inactive"
                 }`}
-                onClick={() => setImprovedPrompt("")}
+                onClick={() => setActiveTab("original")}
               >
                 📝 Original Prompt
               </button>
               <button
                 className={`tab-button ${
-                  improvedPrompt ? "active" : "inactive"
+                  activeTab === "optimized" ? "active" : "inactive"
                 }`}
+                onClick={() => setActiveTab("optimized")}
                 disabled={!improvedPrompt}
               >
                 ⚡ Optimized Result
               </button>
             </div>
 
-            {!improvedPrompt ? (
+            {activeTab === "original" ? (
               <>
                 {/* Original Prompt Tab */}
                 <div style={{ marginBottom: "12px" }}>
@@ -805,7 +815,7 @@ const Popup: React.FC = () => {
                 </button>
 
                 <button
-                  onClick={() => setImprovedPrompt("")}
+                  onClick={() => setActiveTab("original")}
                   style={{
                     width: "100%",
                     padding: "10px",

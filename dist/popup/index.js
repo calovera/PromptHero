@@ -23658,6 +23658,7 @@
     const [toast, setToast] = (0, import_react3.useState)(null);
     const [apiKeyConfigured, setApiKeyConfigured] = (0, import_react3.useState)(true);
     const [error, setError] = (0, import_react3.useState)("");
+    const [activeTab, setActiveTab] = (0, import_react3.useState)("original");
     const [isScoring, setIsScoring] = (0, import_react3.useState)(false);
     const [isOptimizing, setIsOptimizing] = (0, import_react3.useState)(false);
     (0, import_react3.useEffect)(() => {
@@ -23739,6 +23740,7 @@
         } catch (scoreError) {
           console.error("Failed to score improved prompt:", scoreError);
         }
+        setActiveTab("optimized");
         await saveWorkingState({
           prompt: prompt.trim(),
           currentScore: originalScore,
@@ -23783,14 +23785,17 @@
       setImprovedScore(void 0);
       setOptimizeResult(void 0);
       setError("");
+      setActiveTab("original");
     };
     const handleHistoryLoad = (entry, which) => {
       if (which === "original") {
         setPrompt(entry.original);
         setOriginalScore(entry.originalScore);
+        setActiveTab("original");
       } else if (which === "improved" && entry.improved) {
         setPrompt(entry.improved);
         setOriginalScore(entry.improvedScore);
+        setActiveTab("original");
       }
       setImprovedPrompt("");
       setImprovedScore(void 0);
@@ -24204,21 +24209,22 @@
                 /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
                   "button",
                   {
-                    className: `tab-button ${!improvedPrompt ? "active" : "inactive"}`,
-                    onClick: () => setImprovedPrompt(""),
+                    className: `tab-button ${activeTab === "original" ? "active" : "inactive"}`,
+                    onClick: () => setActiveTab("original"),
                     children: "\u{1F4DD} Original Prompt"
                   }
                 ),
                 /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
                   "button",
                   {
-                    className: `tab-button ${improvedPrompt ? "active" : "inactive"}`,
+                    className: `tab-button ${activeTab === "optimized" ? "active" : "inactive"}`,
+                    onClick: () => setActiveTab("optimized"),
                     disabled: !improvedPrompt,
                     children: "\u26A1 Optimized Result"
                   }
                 )
               ] }),
-              !improvedPrompt ? /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(import_jsx_runtime13.Fragment, { children: [
+              activeTab === "original" ? /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(import_jsx_runtime13.Fragment, { children: [
                 /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("div", { style: { marginBottom: "12px" }, children: [
                   /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
                     "div",
@@ -24402,7 +24408,7 @@
                 /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
                   "button",
                   {
-                    onClick: () => setImprovedPrompt(""),
+                    onClick: () => setActiveTab("original"),
                     style: {
                       width: "100%",
                       padding: "10px",
