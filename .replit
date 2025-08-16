@@ -24,11 +24,11 @@ args = "Test Extension"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Web Demo Server"
+args = "Build Extension"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Build Extension"
+args = "PromptHero Extension"
 
 [[workflows.workflow]]
 name = "Install Dependencies"
@@ -53,24 +53,23 @@ args = "echo \"PromptHero Extension Testing Suite\" && echo \"\" && echo \"✅ E
 outputType = "console"
 
 [[workflows.workflow]]
-name = "Web Demo Server"
-author = "agent"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "cd web-demo && node server.cjs"
-waitForPort = 5000
-
-[workflows.workflow.metadata]
-outputType = "webview"
-
-[[workflows.workflow]]
 name = "Build Extension"
 author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "chmod +x build-esbuild.js && node --max-old-space-size=512 build-esbuild.js"
+
+[workflows.workflow.metadata]
+outputType = "console"
+
+[[workflows.workflow]]
+name = "PromptHero Extension"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node build-esbuild.js && echo \"Extension built! Load ./dist/ in Chrome\" && echo \"chrome://extensions/ -> Developer mode -> Load unpacked -> Select ./dist/\""
 
 [workflows.workflow.metadata]
 outputType = "console"
