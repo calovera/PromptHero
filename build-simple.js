@@ -71,19 +71,22 @@ const schemaScript = fs.readFileSync("dist/lib/schema.js", "utf8");
 // Create a bundled background script
 const bundledBackground = `
 // Bundled background script for PromptHero
-import { z } from "zod";
 
-// Schema definitions
-const ScoreSchema = z.object({
-    score: z.number().min(0).max(100),
-    issues: z.array(z.string()).max(8),
-    suggestions: z.array(z.string()).max(8)
-});
+// Simple validation functions (no external dependencies)
+function validateScore(data) {
+    if (typeof data !== 'object' || data === null) return false;
+    if (typeof data.score !== 'number' || data.score < 0 || data.score > 100) return false;
+    if (!Array.isArray(data.issues) || !Array.isArray(data.suggestions)) return false;
+    if (data.issues.length > 8 || data.suggestions.length > 8) return false;
+    return true;
+}
 
-const OptimizeSchema = z.object({
-    improved_prompt: z.string().min(1),
-    checklist: z.array(z.string()).max(12)
-});
+function validateOptimize(data) {
+    if (typeof data !== 'object' || data === null) return false;
+    if (typeof data.improved_prompt !== 'string' || data.improved_prompt.length === 0) return false;
+    if (!Array.isArray(data.checklist) || data.checklist.length > 12) return false;
+    return true;
+}
 
 // Gemini API functions
 const SCORER_SYSTEM = "You are a prompt quality judge. Return JSON only that passes this schema: { score: number 0..100, issues: string[], suggestions: string[] }. Scoring rubric: Clarity 25, Specificity 25, Constraints 20, Context 15, Output format 10, Token efficiency 5. Keep issues and suggestions short and actionable. No extra text.";
@@ -145,33 +148,43 @@ async function callGemini(system, user, opts) {
     return text;
 }
 
-async function callJson(system, user, schema, opts) {
+async function callJson(system, user, validator, opts) {
     let text;
     try {
         text = await callGemini(system, user, opts);
         const parsed = JSON.parse(text);
-        return schema.parse(parsed);
+        if (!validator(parsed)) {
+            throw new Error('Invalid response format');
+        }
+        return parsed;
     }
     catch (error) {
         // Retry once with stricter instruction
         const retrySystem = system + " Return VALID JSON only. No prose.";
         text = await callGemini(retrySystem, user, opts);
         const parsed = JSON.parse(text);
-        return schema.parse(parsed);
+        if (!validator(parsed)) {
+            throw new Error('Invalid response format after retry');
+        }
+        return parsed;
     }
 }
 
 async function scorePrompt(prompt) {
-    return callJson(SCORER_SYSTEM, SCORER_USER(prompt), ScoreSchema, { temperature: 0.1, maxTokens: 128 });
+    return callJson(SCORER_SYSTEM, SCORER_USER(prompt), validateScore, { temperature: 0.1, maxTokens: 128 });
 }
 
 async function optimizePrompt(prompt) {
-    return callJson(OPTIMIZER_SYSTEM, OPTIMIZER_USER(prompt), OptimizeSchema, { temperature: 0.5, maxTokens: 512 });
+    return callJson(OPTIMIZER_SYSTEM, OPTIMIZER_USER(prompt), validateOptimize, { temperature: 0.5, maxTokens: 512 });
 }
 
 async function testApiKey() {
-    const result = await callJson("Return JSON only: { ok: true }", "Return {\\"ok\\":true}", z.object({ ok: z.boolean() }), { temperature: 0, maxTokens: 32 });
-    return result;
+    const text = await callGemini("Return JSON only: { ok: true }", "Return {\\"ok\\":true}", { temperature: 0, maxTokens: 32 });
+    const parsed = JSON.parse(text);
+    if (typeof parsed.ok !== 'boolean') {
+        throw new Error('Invalid test response');
+    }
+    return parsed;
 }
 
 // Message handler

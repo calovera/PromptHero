@@ -38,7 +38,7 @@ let backgroundScript = fs.readFileSync(backgroundPath, "utf8");
 // Replace the API key retrieval to use the environment variable for development
 const replacementCode = `
 // Development mode: Use environment API key
-async function getStoredApiKey() {
+async function getApiKey() {
   const devApiKey = "${GEMINI_API_KEY}";
   if (devApiKey) {
     console.log('🔑 Using development API key');
@@ -46,8 +46,8 @@ async function getStoredApiKey() {
   }
   
   try {
-    const result = await chrome.storage.sync.get(['geminiApiKey']);
-    return result.geminiApiKey || null;
+    const result = await chrome.storage.local.get(['gemini_api_key']);
+    return result.gemini_api_key || null;
   } catch (error) {
     console.error('Failed to get API key:', error);
     return null;
@@ -55,8 +55,8 @@ async function getStoredApiKey() {
 }
 `;
 
-// Find the getStoredApiKey function and replace it
-const functionRegex = /async function getStoredApiKey\(\)[^}]+\}[^}]*\}/s;
+// Find the getApiKey function and replace it
+const functionRegex = /async function getApiKey\(\)[^}]+\}[^}]*\}/s;
 backgroundScript = backgroundScript.replace(
   functionRegex,
   replacementCode.trim()

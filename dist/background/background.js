@@ -1,138 +1,183 @@
-
 // Bundled background script for PromptHero
-import { z } from "zod";
 
-// Schema definitions
-const ScoreSchema = z.object({
-    score: z.number().min(0).max(100),
-    issues: z.array(z.string()).max(8),
-    suggestions: z.array(z.string()).max(8)
-});
+// Simple validation functions (no external dependencies)
+function validateScore(data) {
+  if (typeof data !== "object" || data === null) return false;
+  if (typeof data.score !== "number" || data.score < 0 || data.score > 100)
+    return false;
+  if (!Array.isArray(data.issues) || !Array.isArray(data.suggestions))
+    return false;
+  if (data.issues.length > 8 || data.suggestions.length > 8) return false;
+  return true;
+}
 
-const OptimizeSchema = z.object({
-    improved_prompt: z.string().min(1),
-    checklist: z.array(z.string()).max(12)
-});
+function validateOptimize(data) {
+  if (typeof data !== "object" || data === null) return false;
+  if (
+    typeof data.improved_prompt !== "string" ||
+    data.improved_prompt.length === 0
+  )
+    return false;
+  if (!Array.isArray(data.checklist) || data.checklist.length > 12)
+    return false;
+  return true;
+}
 
 // Gemini API functions
-const SCORER_SYSTEM = "You are a prompt quality judge. Return JSON only that passes this schema: { score: number 0..100, issues: string[], suggestions: string[] }. Scoring rubric: Clarity 25, Specificity 25, Constraints 20, Context 15, Output format 10, Token efficiency 5. Keep issues and suggestions short and actionable. No extra text.";
+const SCORER_SYSTEM =
+  "You are a prompt quality judge. Return JSON only that passes this schema: { score: number 0..100, issues: string[], suggestions: string[] }. Scoring rubric: Clarity 25, Specificity 25, Constraints 20, Context 15, Output format 10, Token efficiency 5. Keep issues and suggestions short and actionable. No extra text.";
 const SCORER_USER = (template) => `Evaluate this prompt.
 PROMPT
 ${template}
 Return JSON only.`;
 
-const OPTIMIZER_SYSTEM = "You are a prompt engineer. Rewrite the prompt to maximize task success while keeping the same goal. If the prompt is vague or brief, infer reasonable defaults and add missing context requests and constraints. Add clear step-by-step instructions. Specify the desired output format. Keep it concise and token-efficient. Return JSON only that passes: { improved_prompt: string, checklist: string[] }. Checklist lists what you improved. No extra text.";
+const OPTIMIZER_SYSTEM =
+  "You are a prompt engineer. Rewrite the prompt to maximize task success while keeping the same goal. If the prompt is vague or brief, infer reasonable defaults and add missing context requests and constraints. Add clear step-by-step instructions. Specify the desired output format. Keep it concise and token-efficient. Return JSON only that passes: { improved_prompt: string, checklist: string[] }. Checklist lists what you improved. No extra text.";
 const OPTIMIZER_USER = (template) => `Rewrite this prompt.
 PROMPT
 ${template}
 Return JSON only.`;
 
+// Development mode: Use environment API key
 async function getApiKey() {
-    try {
-        const result = await chrome.storage.local.get(['gemini_api_key']);
-        return result.gemini_api_key || null;
-    }
-    catch (error) {
-        console.error('Failed to get API key:', error);
-        return null;
-    }
+  const devApiKey = "AIzaSyBrP33BvTPfC-Fuu_Gi3QpEneMWGJjDVPw";
+  if (devApiKey) {
+    console.log("🔑 Using development API key");
+    return devApiKey;
+  }
+
+  try {
+    const result = await chrome.storage.local.get(["gemini_api_key"]);
+    return result.gemini_api_key || null;
+  } catch (error) {
+    console.error("Failed to get API key:", error);
+    return null;
+  }
 }
 
 async function ensureApiKeyOrThrow() {
-    const apiKey = await getApiKey();
-    if (!apiKey) {
-        throw new Error('API key not found. Please configure your Gemini API key in the options page.');
-    }
-    return apiKey;
+  const apiKey = await getApiKey();
+  if (!apiKey) {
+    throw new Error(
+      "API key not found. Please configure your Gemini API key in the options page."
+    );
+  }
+  return apiKey;
 }
 
 async function callGemini(system, user, opts) {
-    const apiKey = await ensureApiKeyOrThrow();
-    const body = {
-        contents: [{
-                role: "user",
-                parts: [{ text: `${system}\n\n${user}` }]
-            }],
-        generationConfig: {
-            temperature: opts?.temperature ?? 0.3,
-            maxOutputTokens: opts?.maxTokens ?? 256
-        }
-    };
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${apiKey}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-    });
-    if (!response.ok) {
-        throw new Error(`Gemini API error: ${response.status} ${response.statusText}`);
+  const apiKey = await ensureApiKeyOrThrow();
+  const body = {
+    contents: [
+      {
+        role: "user",
+        parts: [{ text: `${system}\n\n${user}` }],
+      },
+    ],
+    generationConfig: {
+      temperature: opts?.temperature ?? 0.3,
+      maxOutputTokens: opts?.maxTokens ?? 256,
+    },
+  };
+  const response = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${apiKey}`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
     }
-    const data = await response.json();
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!text) {
-        throw new Error('No response from Gemini API');
-    }
-    return text;
+  );
+  if (!response.ok) {
+    throw new Error(
+      `Gemini API error: ${response.status} ${response.statusText}`
+    );
+  }
+  const data = await response.json();
+  const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+  if (!text) {
+    throw new Error("No response from Gemini API");
+  }
+  return text;
 }
 
-async function callJson(system, user, schema, opts) {
-    let text;
-    try {
-        text = await callGemini(system, user, opts);
-        const parsed = JSON.parse(text);
-        return schema.parse(parsed);
+async function callJson(system, user, validator, opts) {
+  let text;
+  try {
+    text = await callGemini(system, user, opts);
+    const parsed = JSON.parse(text);
+    if (!validator(parsed)) {
+      throw new Error("Invalid response format");
     }
-    catch (error) {
-        // Retry once with stricter instruction
-        const retrySystem = system + " Return VALID JSON only. No prose.";
-        text = await callGemini(retrySystem, user, opts);
-        const parsed = JSON.parse(text);
-        return schema.parse(parsed);
+    return parsed;
+  } catch (error) {
+    // Retry once with stricter instruction
+    const retrySystem = system + " Return VALID JSON only. No prose.";
+    text = await callGemini(retrySystem, user, opts);
+    const parsed = JSON.parse(text);
+    if (!validator(parsed)) {
+      throw new Error("Invalid response format after retry");
     }
+    return parsed;
+  }
 }
 
 async function scorePrompt(prompt) {
-    return callJson(SCORER_SYSTEM, SCORER_USER(prompt), ScoreSchema, { temperature: 0.1, maxTokens: 128 });
+  return callJson(SCORER_SYSTEM, SCORER_USER(prompt), validateScore, {
+    temperature: 0.1,
+    maxTokens: 128,
+  });
 }
 
 async function optimizePrompt(prompt) {
-    return callJson(OPTIMIZER_SYSTEM, OPTIMIZER_USER(prompt), OptimizeSchema, { temperature: 0.5, maxTokens: 512 });
+  return callJson(OPTIMIZER_SYSTEM, OPTIMIZER_USER(prompt), validateOptimize, {
+    temperature: 0.5,
+    maxTokens: 512,
+  });
 }
 
 async function testApiKey() {
-    const result = await callJson("Return JSON only: { ok: true }", "Return {\"ok\":true}", z.object({ ok: z.boolean() }), { temperature: 0, maxTokens: 32 });
-    return result;
+  const text = await callGemini(
+    "Return JSON only: { ok: true }",
+    'Return {"ok":true}',
+    { temperature: 0, maxTokens: 32 }
+  );
+  const parsed = JSON.parse(text);
+  if (typeof parsed.ok !== "boolean") {
+    throw new Error("Invalid test response");
+  }
+  return parsed;
 }
 
 // Message handler
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    console.log('Background script received message:', message);
-    (async () => {
-        try {
-            switch (message.type) {
-                case 'SCORE_PROMPT':
-                    const data = await scorePrompt(message.prompt);
-                    sendResponse({ ok: true, data });
-                    break;
-                case 'OPTIMIZE_PROMPT':
-                    const optimizeData = await optimizePrompt(message.prompt);
-                    sendResponse({ ok: true, data: optimizeData });
-                    break;
-                case 'TEST_API_KEY':
-                    const testResult = await testApiKey();
-                    sendResponse({ ok: true, data: testResult });
-                    break;
-                default:
-                    sendResponse({ ok: false, error: 'Unknown message type' });
-            }
-        }
-        catch (error) {
-            console.error('Background script error:', error);
-            sendResponse({
-                ok: false,
-                error: error instanceof Error ? error.message : 'Unknown error occurred'
-            });
-        }
-    })();
-    // Return true to keep async channel open
-    return true;
+  console.log("Background script received message:", message);
+  (async () => {
+    try {
+      switch (message.type) {
+        case "SCORE_PROMPT":
+          const data = await scorePrompt(message.prompt);
+          sendResponse({ ok: true, data });
+          break;
+        case "OPTIMIZE_PROMPT":
+          const optimizeData = await optimizePrompt(message.prompt);
+          sendResponse({ ok: true, data: optimizeData });
+          break;
+        case "TEST_API_KEY":
+          const testResult = await testApiKey();
+          sendResponse({ ok: true, data: testResult });
+          break;
+        default:
+          sendResponse({ ok: false, error: "Unknown message type" });
+      }
+    } catch (error) {
+      console.error("Background script error:", error);
+      sendResponse({
+        ok: false,
+        error:
+          error instanceof Error ? error.message : "Unknown error occurred",
+      });
+    }
+  })();
+  // Return true to keep async channel open
+  return true;
 });

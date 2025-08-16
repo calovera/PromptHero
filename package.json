@@ -9,6 +9,7 @@
     "build:vite": "node build.js",
     "setup": "node setup-env.js",
     "setup:dev": "node setup-dev.js",
+    "verify": "node verify-extension.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
