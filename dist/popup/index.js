@@ -23863,6 +23863,10 @@
           /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("style", { children: `
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         
+        * {
+          box-sizing: border-box;
+        }
+        
         :root {
             --primary-purple: #6366f1;
             --secondary-purple: #8b5cf6;
@@ -23882,6 +23886,9 @@
             color: var(--text-primary);
             margin: 0;
             padding: 0;
+            width: 400px;
+            height: 600px;
+            overflow: hidden;
         }
         
         @keyframes spin {
@@ -23890,33 +23897,31 @@
         }
         @keyframes pulse {
           0%, 100% { transform: scale(1); }
-          50% { transform: scale(1.1); }
+          50% { transform: scale(1.05); }
         }
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
         }
         
         .popup-container {
           width: 400px;
           height: 600px;
           background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-          padding: 0;
-          margin: 0;
-          overflow: hidden;
           position: relative;
+          overflow: hidden;
         }
         
         .popup-content {
-          padding: 16px;
           height: 100%;
           overflow-y: auto;
+          padding: 20px;
           scrollbar-width: thin;
-          scrollbar-color: rgba(255,255,255,0.3) transparent;
+          scrollbar-color: rgba(255,255,255,0.2) transparent;
         }
         
         .popup-content::-webkit-scrollbar {
-          width: 6px;
+          width: 4px;
         }
         
         .popup-content::-webkit-scrollbar-track {
@@ -23924,8 +23929,12 @@
         }
         
         .popup-content::-webkit-scrollbar-thumb {
+          background: rgba(255,255,255,0.2);
+          border-radius: 2px;
+        }
+        
+        .popup-content::-webkit-scrollbar-thumb:hover {
           background: rgba(255,255,255,0.3);
-          border-radius: 3px;
         }
         
         .header-title {
@@ -23934,17 +23943,226 @@
           -webkit-text-fill-color: transparent;
           background-clip: text;
           font-weight: 700;
-          font-size: 24px;
-          margin-bottom: 6px;
+          font-size: 28px;
+          margin-bottom: 4px;
           text-align: center;
           letter-spacing: -0.5px;
         }
         
         .glassmorphic {
+          background: rgba(255, 255, 255, 0.08);
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          border-radius: 12px;
+          backdrop-filter: blur(20px);
+        }
+        
+        .tab-container {
+          display: flex;
+          background: rgba(255, 255, 255, 0.05);
+          border-radius: 16px;
+          padding: 4px;
+          margin-bottom: 20px;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .tab-button {
+          flex: 1;
+          padding: 12px 16px;
+          border: none;
+          border-radius: 12px;
+          font-family: inherit;
+          font-size: 14px;
+          font-weight: 500;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          position: relative;
+          overflow: hidden;
+        }
+        
+        .tab-button.active {
+          background: linear-gradient(135deg, var(--primary-purple), var(--secondary-purple));
+          color: white;
+          box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        }
+        
+        .tab-button.inactive {
+          background: transparent;
+          color: var(--text-secondary);
+        }
+        
+        .tab-button.inactive:hover {
+          background: rgba(255, 255, 255, 0.1);
+          color: var(--text-primary);
+        }
+        
+        .tab-button:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+        
+        .input-container {
+          margin-bottom: 20px;
+        }
+        
+        .input-label {
+          color: var(--text-readable);
+          font-size: 14px;
+          font-weight: 500;
+          margin-bottom: 8px;
+          display: block;
+        }
+        
+        .prompt-textarea {
+          width: 100%;
+          min-height: 120px;
+          max-height: 200px;
+          padding: 16px;
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid rgba(255, 255, 255, 0.15);
+          border-radius: 10px;
+          color: var(--text-primary);
+          font-size: 14px;
+          line-height: 1.5;
+          resize: vertical;
+          font-family: inherit;
+          transition: all 0.2s ease;
+        }
+        
+        .prompt-textarea:focus {
+          outline: none;
+          border-color: var(--primary-purple);
+          box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+        
+        .prompt-textarea::placeholder {
+          color: var(--text-muted);
+        }
+        
+        .button-group {
+          display: flex;
+          gap: 12px;
+          margin-bottom: 20px;
+        }
+        
+        .action-button {
+          flex: 1;
+          padding: 14px;
+          border: none;
+          border-radius: 10px;
+          font-family: inherit;
+          font-size: 14px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          position: relative;
+          overflow: hidden;
+        }
+        
+        .action-button:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+        
+        .action-button.score {
+          background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+          color: white;
+        }
+        
+        .action-button.score:hover:not(:disabled) {
+          transform: translateY(-1px);
+          box-shadow: 0 6px 20px rgba(59, 130, 246, 0.3);
+        }
+        
+        .action-button.optimize {
+          background: linear-gradient(135deg, #10b981, #059669);
+          color: white;
+        }
+        
+        .action-button.optimize:hover:not(:disabled) {
+          transform: translateY(-1px);
+          box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
+        }
+        
+        .copy-button {
+          width: 100%;
+          padding: 12px;
+          background: linear-gradient(135deg, var(--primary-purple), var(--secondary-purple));
+          color: white;
+          border: none;
+          border-radius: 10px;
+          font-family: inherit;
+          font-size: 14px;
+          font-weight: 500;
+          cursor: pointer;
+          margin-bottom: 12px;
+          transition: all 0.2s ease;
+        }
+        
+        .copy-button:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 6px 20px rgba(99, 102, 241, 0.3);
+        }
+        
+        .back-button {
+          width: 100%;
+          padding: 12px;
+          background: rgba(255, 255, 255, 0.1);
+          color: var(--text-secondary);
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          border-radius: 10px;
+          font-family: inherit;
+          font-size: 14px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+        
+        .back-button:hover {
           background: rgba(255, 255, 255, 0.15);
-          border: 1px solid rgba(255, 255, 255, 0.25);
+          color: var(--text-primary);
+        }
+        
+        .content-display {
+          padding: 16px;
+          margin-bottom: 16px;
+          max-height: 180px;
+          overflow-y: auto;
+          line-height: 1.6;
+          font-size: 14px;
+          white-space: pre-wrap;
+          scrollbar-width: thin;
+          scrollbar-color: rgba(255,255,255,0.2) transparent;
+        }
+        
+        .content-display::-webkit-scrollbar {
+          width: 4px;
+        }
+        
+        .content-display::-webkit-scrollbar-thumb {
+          background: rgba(255,255,255,0.2);
+          border-radius: 2px;
+        }
+        
+        .settings-button {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          width: 100%;
+          padding: 10px;
+          background: rgba(255,255,255,0.08);
+          color: var(--text-secondary);
+          border: 1px solid rgba(255,255,255,0.12);
           border-radius: 8px;
-          backdrop-filter: blur(15px);
+          font-family: inherit;
+          font-size: 12px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          margin-top: auto;
+        }
+        
+        .settings-button:hover {
+          background: rgba(255,255,255,0.12);
+          color: var(--text-primary);
         }
       ` }),
           /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("div", { className: "popup-container", children: /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("div", { className: "popup-content", children: [
@@ -23970,127 +24188,81 @@
                 "\u26A0\uFE0F ",
                 error
               ] }) }),
-              /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("div", { style: { display: "flex", marginBottom: "16px" }, children: [
+              /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("div", { className: "tab-container", children: [
                 /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
-                  o10,
+                  "button",
                   {
-                    variant: !improvedPrompt ? "solid" : "soft",
-                    size: "2",
-                    style: {
-                      flex: 1,
-                      borderRadius: "8px 0 0 8px",
-                      background: !improvedPrompt ? "linear-gradient(135deg, var(--primary-purple), var(--secondary-purple))" : "rgba(255,255,255,0.1)"
-                    },
+                    className: `tab-button ${!improvedPrompt ? "active" : "inactive"}`,
                     onClick: () => setImprovedPrompt(""),
                     children: "\u{1F4DD} Original Prompt"
                   }
                 ),
                 /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
-                  o10,
+                  "button",
                   {
-                    variant: improvedPrompt ? "solid" : "soft",
-                    size: "2",
-                    style: {
-                      flex: 1,
-                      borderRadius: "0 8px 8px 0",
-                      background: improvedPrompt ? "linear-gradient(135deg, var(--primary-purple), var(--secondary-purple))" : "rgba(255,255,255,0.1)"
-                    },
+                    className: `tab-button ${improvedPrompt ? "active" : "inactive"}`,
                     disabled: !improvedPrompt,
                     children: "\u26A1 Optimized Result"
                   }
                 )
               ] }),
               !improvedPrompt ? /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(import_jsx_runtime13.Fragment, { children: [
-                /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("div", { className: "glassmorphic", style: { padding: "16px", marginBottom: "16px" }, children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(p, { size: "2", weight: "medium", style: { marginBottom: "8px", display: "block" }, children: "Enter your AI prompt:" }),
+                /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("div", { className: "glassmorphic input-container", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("label", { className: "input-label", children: "Enter your AI prompt:" }),
                   /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
                     "textarea",
                     {
+                      className: "prompt-textarea",
                       value: prompt,
                       onChange: (e21) => setPrompt(e21.target.value),
-                      placeholder: "Example: Write a story about a robot...",
-                      style: {
-                        width: "100%",
-                        minHeight: "100px",
-                        padding: "12px",
-                        background: "rgba(255,255,255,0.2)",
-                        border: "1px solid rgba(255,255,255,0.3)",
-                        borderRadius: "6px",
-                        color: "var(--text-primary)",
-                        fontSize: "14px",
-                        lineHeight: "1.5",
-                        resize: "vertical",
-                        fontFamily: "inherit"
-                      },
+                      placeholder: "Example: Write a story about a robot learning to feel emotions...",
                       disabled: isLoading
                     }
                   )
                 ] }),
-                /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("div", { style: { display: "flex", gap: "12px", marginBottom: "16px" }, children: [
+                /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("div", { className: "button-group", children: [
                   /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
-                    o10,
+                    "button",
                     {
+                      className: "action-button score",
                       onClick: handleScore,
                       disabled: !prompt.trim() || isLoading || !apiKeyConfigured,
-                      style: {
-                        flex: 1,
-                        background: "linear-gradient(135deg, #3b82f6, #1d4ed8)",
-                        color: "white"
-                      },
                       children: "\u{1F4CA} Score Prompt"
                     }
                   ),
                   /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
-                    o10,
+                    "button",
                     {
+                      className: "action-button optimize",
                       onClick: handleOptimize,
                       disabled: !prompt.trim() || isLoading || !apiKeyConfigured,
-                      style: {
-                        flex: 1,
-                        background: "linear-gradient(135deg, #10b981, #059669)",
-                        color: "white"
-                      },
                       children: "\u26A1 Optimize Prompt"
                     }
                   )
                 ] }),
                 /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(ScorePanel_default, { title: "Prompt Score", score: originalScore })
               ] }) : /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(import_jsx_runtime13.Fragment, { children: [
-                /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("div", { style: { marginBottom: "16px" }, children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(p, { size: "3", weight: "medium", style: { marginBottom: "8px", display: "block" }, children: "Improved Prompt:" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("div", { className: "glassmorphic", style: {
-                    padding: "16px",
-                    maxHeight: "200px",
-                    overflowY: "auto",
-                    marginBottom: "16px"
-                  }, children: /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(p, { size: "2", style: { whiteSpace: "pre-wrap", lineHeight: 1.5 }, children: improvedPrompt }) })
+                /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("div", { className: "input-container", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("label", { className: "input-label", children: "Improved Prompt:" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("div", { className: "glassmorphic content-display", children: improvedPrompt })
                 ] }),
-                /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("div", { style: { marginBottom: "16px" }, children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(p, { size: "3", weight: "medium", style: { marginBottom: "8px", display: "block" }, children: "What was improved:" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("div", { className: "glassmorphic", style: {
-                    padding: "16px",
-                    maxHeight: "200px",
-                    overflowY: "auto"
-                  }, children: /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(p, { size: "2", style: { whiteSpace: "pre-wrap", lineHeight: 1.5 }, children: optimizeResult?.checklist?.join("\n") || "Optimization details will appear here." }) })
+                /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)("div", { className: "input-container", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("label", { className: "input-label", children: "What was improved:" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("div", { className: "glassmorphic content-display", children: optimizeResult?.checklist?.join("\n\n") || "Optimization details will appear here." })
                 ] }),
                 /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
-                  o10,
+                  "button",
                   {
+                    className: "copy-button",
                     onClick: () => handleCopy(improvedPrompt, "Improved prompt"),
-                    style: {
-                      width: "100%",
-                      background: "linear-gradient(135deg, var(--primary-purple), var(--secondary-purple))",
-                      marginBottom: "12px"
-                    },
                     children: "\u{1F4CB} Copy to Clipboard"
                   }
                 ),
                 /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
-                  o10,
+                  "button",
                   {
-                    variant: "soft",
+                    className: "back-button",
                     onClick: () => setImprovedPrompt(""),
-                    style: { width: "100%" },
                     children: "\u2190 Back to Original"
                   }
                 )
@@ -24122,7 +24294,15 @@
                 }, children: /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(p, { size: "4", weight: "bold", style: { color: "white" }, children: isScoring ? "\u{1F4CA}" : "\u26A1" }) }),
                 /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(p, { size: "3", weight: "medium", style: { color: "white", marginBottom: "8px", display: "block" }, children: isScoring ? "Analyzing your prompt..." : "Creating your improved prompt..." }),
                 /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(p, { size: "2", style: { color: "#888" }, children: isScoring ? "This might take a few seconds" : "Processing with Gemini AI" })
-              ] })
+              ] }),
+              /* @__PURE__ */ (0, import_jsx_runtime13.jsx)("div", { style: { marginTop: "auto", paddingTop: "20px" }, children: /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
+                "button",
+                {
+                  className: "settings-button",
+                  onClick: openOptions,
+                  children: "\u2699\uFE0F API Settings"
+                }
+              ) })
             ] })
           ] }) })
         ]
