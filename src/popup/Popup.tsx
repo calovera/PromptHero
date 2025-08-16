@@ -537,22 +537,48 @@ const Popup: React.FC = () => {
 
           {/* API Key Warning */}
           {!apiKeyConfigured && (
-            <div className="glassmorphic" style={{ padding: '12px', marginBottom: '12px', background: 'rgba(239, 68, 68, 0.15)', borderColor: 'rgba(239, 68, 68, 0.3)' }}>
-              <Text size="2" style={{ color: '#fca5a5' }}>
-                ⚠️ API key not configured.{' '}
-                <Button variant="ghost" size="1" onClick={openOptions} style={{ color: '#fca5a5' }}>
-                  Open Options
-                </Button>
-              </Text>
+            <div style={{ 
+              background: 'rgba(239, 68, 68, 0.1)', 
+              border: '1px solid rgba(239, 68, 68, 0.3)',
+              borderRadius: '8px',
+              padding: '10px 12px',
+              marginBottom: '12px',
+              fontSize: '13px',
+              color: '#fca5a5',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}>
+              <span>⚠️ API key not configured.</span>
+              <button 
+                onClick={openOptions}
+                style={{
+                  background: 'transparent',
+                  border: '1px solid rgba(252, 165, 165, 0.5)',
+                  borderRadius: '4px',
+                  color: '#fca5a5',
+                  padding: '2px 6px',
+                  fontSize: '11px',
+                  cursor: 'pointer'
+                }}
+              >
+                Open Options
+              </button>
             </div>
           )}
 
           {/* Error Display */}
           {error && (
-            <div className="glassmorphic" style={{ padding: '12px', marginBottom: '12px', background: 'rgba(239, 68, 68, 0.15)', borderColor: 'rgba(239, 68, 68, 0.3)' }}>
-              <Text size="2" style={{ color: '#fca5a5' }}>
-                ⚠️ {error}
-              </Text>
+            <div style={{ 
+              background: 'rgba(239, 68, 68, 0.1)', 
+              border: '1px solid rgba(239, 68, 68, 0.3)',
+              borderRadius: '8px',
+              padding: '10px 12px',
+              marginBottom: '12px',
+              fontSize: '13px',
+              color: '#fca5a5'
+            }}>
+              ⚠️ {error}
             </div>
           )}
 
@@ -575,30 +601,80 @@ const Popup: React.FC = () => {
           {!improvedPrompt ? (
             <>
               {/* Original Prompt Tab */}
-              <div className="glassmorphic input-container">
-                <label className="input-label">Enter your AI prompt:</label>
-                <textarea
-                  className="prompt-textarea"
-                  value={prompt}
-                  onChange={(e) => setPrompt(e.target.value)}
-                  placeholder="Example: Write a story about a robot learning to feel emotions..."
-                  disabled={isLoading}
-                />
+              <div style={{ marginBottom: '12px' }}>
+                <div style={{ 
+                  color: 'var(--text-readable)', 
+                  fontSize: '14px', 
+                  fontWeight: '500', 
+                  marginBottom: '8px' 
+                }}>
+                  Enter your AI prompt:
+                </div>
+                <div style={{
+                  background: 'rgba(255, 255, 255, 0.08)',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  borderRadius: '8px',
+                  padding: '12px'
+                }}>
+                  <textarea
+                    value={prompt}
+                    onChange={(e) => setPrompt(e.target.value)}
+                    placeholder="Example: Write a story about a robot learning to feel emotions..."
+                    disabled={isLoading}
+                    style={{
+                      width: '100%',
+                      minHeight: '100px',
+                      background: 'transparent',
+                      border: 'none',
+                      color: 'var(--text-primary)',
+                      fontSize: '14px',
+                      lineHeight: '1.4',
+                      resize: 'vertical',
+                      fontFamily: 'inherit',
+                      outline: 'none',
+                      boxSizing: 'border-box'
+                    }}
+                  />
+                </div>
               </div>
 
               {/* Action Buttons */}
-              <div className="button-group">
+              <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
                 <button 
-                  className="action-button score"
                   onClick={handleScore}
                   disabled={!prompt.trim() || isLoading || !apiKeyConfigured}
+                  style={{
+                    flex: 1,
+                    padding: '10px',
+                    background: 'linear-gradient(135deg, #3b82f6, #1d4ed8)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    fontSize: '13px',
+                    fontWeight: '600',
+                    cursor: !prompt.trim() || isLoading || !apiKeyConfigured ? 'not-allowed' : 'pointer',
+                    opacity: !prompt.trim() || isLoading || !apiKeyConfigured ? 0.5 : 1,
+                    transition: 'all 0.2s ease'
+                  }}
                 >
                   📊 Score Prompt
                 </button>
                 <button 
-                  className="action-button optimize"
                   onClick={handleOptimize}
                   disabled={!prompt.trim() || isLoading || !apiKeyConfigured}
+                  style={{
+                    flex: 1,
+                    padding: '10px',
+                    background: 'linear-gradient(135deg, #10b981, #059669)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    fontSize: '13px',
+                    fontWeight: '600',
+                    cursor: !prompt.trim() || isLoading || !apiKeyConfigured ? 'not-allowed' : 'pointer',
+                    opacity: !prompt.trim() || isLoading || !apiKeyConfigured ? 0.5 : 1,
+                    transition: 'all 0.2s ease'
+                  }}
                 >
                   ⚡ Optimize Prompt
                 </button>
@@ -610,30 +686,86 @@ const Popup: React.FC = () => {
           ) : (
             <>
               {/* Optimized Result Tab */}
-              <div className="input-container">
-                <label className="input-label">Improved Prompt:</label>
-                <div className="glassmorphic content-display">
+              <div style={{ marginBottom: '12px' }}>
+                <div style={{ 
+                  color: 'var(--text-readable)', 
+                  fontSize: '14px', 
+                  fontWeight: '500', 
+                  marginBottom: '8px' 
+                }}>
+                  Improved Prompt:
+                </div>
+                <div style={{
+                  background: 'rgba(255, 255, 255, 0.08)',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  borderRadius: '8px',
+                  padding: '12px',
+                  maxHeight: '140px',
+                  overflowY: 'auto',
+                  fontSize: '14px',
+                  lineHeight: '1.5',
+                  whiteSpace: 'pre-wrap'
+                }}>
                   {improvedPrompt}
                 </div>
               </div>
 
-              <div className="input-container">
-                <label className="input-label">What was improved:</label>
-                <div className="glassmorphic content-display">
+              <div style={{ marginBottom: '12px' }}>
+                <div style={{ 
+                  color: 'var(--text-readable)', 
+                  fontSize: '14px', 
+                  fontWeight: '500', 
+                  marginBottom: '8px' 
+                }}>
+                  What was improved:
+                </div>
+                <div style={{
+                  background: 'rgba(255, 255, 255, 0.08)',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  borderRadius: '8px',
+                  padding: '12px',
+                  maxHeight: '120px',
+                  overflowY: 'auto',
+                  fontSize: '13px',
+                  lineHeight: '1.5',
+                  whiteSpace: 'pre-wrap'
+                }}>
                   {optimizeResult?.checklist?.join('\n\n') || 'Optimization details will appear here.'}
                 </div>
               </div>
 
               <button 
-                className="copy-button"
                 onClick={() => handleCopy(improvedPrompt, 'Improved prompt')}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  background: 'linear-gradient(135deg, var(--primary-purple), var(--secondary-purple))',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '13px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  marginBottom: '8px',
+                  transition: 'all 0.2s ease'
+                }}
               >
                 📋 Copy to Clipboard
               </button>
 
               <button 
-                className="back-button"
                 onClick={() => setImprovedPrompt('')}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  background: 'rgba(255, 255, 255, 0.1)',
+                  color: 'var(--text-secondary)',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  borderRadius: '8px',
+                  fontSize: '13px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease'
+                }}
               >
                 ← Back to Original
               </button>
@@ -681,10 +813,24 @@ const Popup: React.FC = () => {
           )}
 
           {/* Settings Access */}
-          <div style={{ marginTop: 'auto', paddingTop: '16px', paddingBottom: '4px' }}>
+          <div style={{ marginTop: 'auto', paddingTop: '12px', paddingBottom: '8px' }}>
             <button 
-              className="settings-button"
               onClick={openOptions}
+              style={{
+                width: '100%',
+                padding: '8px',
+                background: 'rgba(255,255,255,0.08)',
+                color: 'var(--text-secondary)',
+                border: '1px solid rgba(255,255,255,0.15)',
+                borderRadius: '6px',
+                fontSize: '12px',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '6px'
+              }}
             >
               ⚙️ API Settings
             </button>
