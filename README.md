@@ -45,6 +45,8 @@ PromptHero is a powerful Chrome extension that helps you optimize your AI prompt
    
    # Configure API key for development
    npm run setup:dev
+
+   # FOR PRODUCTION USE: node build-esbuild.js
    
    # Load in Chrome
    # 1. Open chrome://extensions/
