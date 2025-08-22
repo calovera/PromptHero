@@ -1,0 +1,9 @@
+Privacy Policy – PromptHero
+
+PromptHero is a Chrome Extension designed to help users score and optimize AI prompts. 
+
+• Data we collect: The extension only processes the prompts that users manually enter. Prompts are sent to the Gemini API for processing. 
+• API key storage: Your Gemini API key is stored locally in your browser via chrome.storage. 
+• No other personal data is collected, sold, or shared. 
+• We do not transfer any user data to third parties, except when necessary to fulfill the extension’s core function (sending prompts to the Gemini API). 
+• PromptHero complies with the Chrome Web Store Developer Program Policies.
